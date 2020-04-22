@@ -112,6 +112,19 @@ public class Date implements Comparable<Date>
     {
         if (month < 1 || month > 12)
             return false;
+        if (day < 1 || day > getMaxDay(month, year))
+            return false;
+        return true;
+    }
+
+    /**
+     * Gets the maximum day on a given month on a given year.
+     * @param month The month, in the range [1, 12].
+     * @param year The year.
+     * @return The maximum day of this month.
+     */
+    private int getMaxDay(int month, int year)
+    {
         int maxDay;
         switch (month)
         {
@@ -129,9 +142,7 @@ public class Date implements Comparable<Date>
                     maxDay = 28;
                 break;
         }
-        if (day < 1 || day > maxDay)
-            return false;
-        return true;
+        return maxDay;
     }
 
     /**
@@ -178,6 +189,34 @@ public class Date implements Comparable<Date>
     public Weekday getWeekday()
     {
         return weekday;
+    }
+
+    /**
+     * The date corresponding to the next valid day.
+     * @return The next valid date.
+     */
+    public Date getNextDate()
+    {
+        if (isValidDate(month, day + 1, year))
+            return new Date(month, day, year);
+        else if (isValidDate(month + 1, 1, year))
+            return new Date(month + 1, 1, year);
+        else
+            return new Date(1, 1, year + 1);
+    }
+
+    /**
+     * The date corresponding to the previous valid day.
+     * @return The previous valid date.
+     */
+    public Date getPreviousDate()
+    {
+        if (day - 1 > 0)
+            return new Date(month, day - 1, year);
+        else if (month - 1 > 0)
+            return new Date(month - 1, getMaxDay(month, year), year);
+        else
+            return new Date(12, getMaxDay(12, year + 1), year + 1);
     }
 
     /**
