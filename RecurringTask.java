@@ -12,8 +12,6 @@ public class RecurringTask extends Task
      * Initializes a recurring task.
      * @param taskName The name of the task.
      * @param category The name of the category this task is part of.
-     * @param startingTime A time ranging from 0 to 1440 minutes (24 hours) to represent the start of the timeframe.
-     * @param duration The duration of the activity in minutes.
      * @param timeframe The timeframe of the task.
      * @param taskFrequency The number of days between each occurence of the task.
      * @throws InvalidTaskException If the provided category is not valid.
