@@ -198,7 +198,7 @@ public class Date implements Comparable<Date>
     public Date getNextDate()
     {
         if (isValidDate(month, day + 1, year))
-            return new Date(month, day, year);
+            return new Date(month, day + 1, year);
         else if (isValidDate(month + 1, 1, year))
             return new Date(month + 1, 1, year);
         else
