@@ -105,6 +105,17 @@ public abstract class Task
     }
 
     /**
+     * Checks whether the timeframe of this task conflicts with the one provided.
+     * Note: This does not consider conflicting dates, only time slots.
+     * @param timeframe The timeframe tio compare against this one.
+     * @return True if there is a time slot conflict, false otherwise.
+     */
+    public boolean hasConflictingTimeframesWith(Timeframe timeframe)
+    {
+        return timeSlot.conflictsWith(timeframe);
+    }
+
+    /**
      * Gives the name of the task.
      * @return The name of the task.
      */

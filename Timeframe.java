@@ -93,6 +93,19 @@ public class Timeframe
     }
 
     /**
+     * Gets the number of minutes in the timeframe leading into the next day.
+     * For example, a timeframe at 1425 with duration 30 would run 15 minutes into the next day.
+     * @return The number of minutes leading into the next day.
+     */
+    public int getNextDayRunoff()
+    {
+        if (startingTime + duration > 1440)
+            return (startingTime + duration) % 1440;
+        else
+            return 0;
+    }
+
+    /**
      * Gets the number of minutes in a floating point number of hours,
      * rounded to the nearest 15 minutes.
      * @param hours A floating point number of hours.
