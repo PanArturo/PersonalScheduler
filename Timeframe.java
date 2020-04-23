@@ -123,8 +123,8 @@ public class Timeframe
      */
     public boolean conflictsWith(Timeframe t)
     {
-        if (startingTime >= t.startingTime && startingTime <= (t.startingTime + t.duration)
-            || t.startingTime >= startingTime && t.startingTime <= (startingTime + duration))
+        if (startingTime >= t.startingTime && startingTime < (t.startingTime + t.duration)
+            || t.startingTime >= startingTime && t.startingTime < (startingTime + duration))
             return true;
         return false;
     }
