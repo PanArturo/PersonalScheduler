@@ -12,9 +12,9 @@ public class Timeframe
      *                     Must be a multiple of 15 ranging from 0 (00:00) to 1425 (23:45).
      * @param duration The duration of the activity in minutes.
      *                 Must be a multiple of 15 ranging from 15 (00:15) to 1425 (23:45).
-     * @throws InvalidTaskException If the given time is out of range or not a multiple of 15.
+     * @throws InvalidTimeframeException If the given time is out of range or not a multiple of 15.
      */
-    public Timeframe(int startingTime, int duration) throws InvalidTaskException
+    public Timeframe(int startingTime, int duration) throws InvalidTimeframeException
     {
         setStartingTime(startingTime);
         setDuration(duration);
@@ -26,9 +26,9 @@ public class Timeframe
      *                     Will be rounded to the nearest quarter hour.
      * @param duration The duration of the activity in hours ranging from 0.25 to 23.75.
      *                 Will be rounded to the nearest quarter hour.
-     * @throws InvalidTaskException If the given time is out of range.
+     * @throws InvalidTimeframeException If the given time is out of range.
      */
-    public Timeframe(double startingTime, double duration) throws InvalidTaskException
+    public Timeframe(double startingTime, double duration) throws InvalidTimeframeException
     {
         setStartingTime(calculateMinutes(startingTime));
         setDuration(calculateMinutes(duration));
@@ -48,14 +48,14 @@ public class Timeframe
      * Sets the starting time.
      * @param startingTime The starting time of the activity in minutes.
      *                     Must be a multiple of 15 ranging from 0 (00:00) to 1425 (23:45).
-     * @throws InvalidTaskException If the given time is out of range or not a multiple of 15.
+     * @throws InvalidTimeframeException If the given time is out of range or not a multiple of 15.
      */
-    public void setStartingTime(int startingTime) throws InvalidTaskException
+    public void setStartingTime(int startingTime) throws InvalidTimeframeException
     {
         if (startingTime % 15 != 0)
-            throw new InvalidTaskException("The time " + startingTime + " is not a multiple of 15!");
+            throw new InvalidTimeframeException("The time " + startingTime + " is not a multiple of 15!");
         if (startingTime < 0 || startingTime > 1425)
-            throw new InvalidTaskException("The time " + startingTime + " is out of range!");
+            throw new InvalidTimeframeException("The time " + startingTime + " is out of range!");
         this.startingTime = startingTime;
     }
 
@@ -63,14 +63,14 @@ public class Timeframe
      * Sets the duration.
      * @param duration The duration of the activity in minutes.
      *                 Must be a multiple of 15 ranging from 15 (00:15) to 1425 (23:45).
-     * @throws InvalidTaskException If the given duration is out of range or not a multiple of 15.
+     * @throws InvalidTimeframeException If the given duration is out of range or not a multiple of 15.
      */
-    public void setDuration(int duration)
+    public void setDuration(int duration) throws InvalidTimeframeException
     {
         if (duration % 15 != 0)
-            throw new InvalidTaskException("The duration " + duration + " is not a multiple of 15!");
+            throw new InvalidTimeframeException("The duration " + duration + " is not a multiple of 15!");
         if (duration < 15 || duration > 1425)
-            throw new InvalidTaskException("The duration " + duration + " is out of range!");
+            throw new InvalidTimeframeException("The duration " + duration + " is out of range!");
         this.duration = duration;
     }
 
@@ -103,6 +103,22 @@ public class Timeframe
             return (startingTime + duration) % 1440;
         else
             return 0;
+    }
+
+    /**
+     * Returns a new timeframe restricted to a single day.
+     * @param getNextDayPortion False to get the portion of the timeframe leading to midnight.
+     *                True to get the portion of the timeframe running into the next day.
+     * @return A timeframe restricted to the current or next day,
+     *         or the original timeframe if the timeframe does not run into the next day.
+     */
+    public Timeframe truncate(boolean getNextDayPortion)
+    {
+        int nextDayRunoff = getNextDayRunoff();
+        if (getNextDayPortion && nextDayRunoff > 0)
+            return new Timeframe(0, nextDayRunoff);
+        else
+            return new Timeframe(startingTime, duration - nextDayRunoff);
     }
 
     /**

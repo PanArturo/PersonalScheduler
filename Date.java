@@ -102,50 +102,6 @@ public class Date implements Comparable<Date>
     }
 
     /**
-     * Checks whether the provided date is valid or not.
-     * @param month An integer ranging from 1 to 12 to represent the month.
-     * @param day An integer to represent the day of the month.
-     * @param year An integer to represent the year.
-     * @return True if the date is valid, false otherwise.
-     */
-    private boolean isValidDate(int month, int day, int year)
-    {
-        if (month < 1 || month > 12)
-            return false;
-        if (day < 1 || day > getMaxDay(month, year))
-            return false;
-        return true;
-    }
-
-    /**
-     * Gets the maximum day on a given month on a given year.
-     * @param month The month, in the range [1, 12].
-     * @param year The year.
-     * @return The maximum day of this month.
-     */
-    private int getMaxDay(int month, int year)
-    {
-        int maxDay;
-        switch (month)
-        {
-            case 1: case 3: case 5: case 7: case 8: case 10: case 12:
-                maxDay = 31;
-                break;
-            case 4: case 6: case 9: case 11:
-                maxDay = 30;
-                break;
-            default:
-                // Handle Leap Years
-                if (year % 4 == 0 && ((year % 100 != 0) || (year % 400 == 0)))
-                    maxDay = 29;
-                else
-                    maxDay = 28;
-                break;
-        }
-        return maxDay;
-    }
-
-    /**
      * Determines which day of the week this date falls on using Zeller's congruence.
      * @return A weekday constant from the Weekday enum.
      */
@@ -195,7 +151,7 @@ public class Date implements Comparable<Date>
      * The date corresponding to the next valid day.
      * @return The next valid date.
      */
-    public Date getNextDate()
+    public Date getNextDay()
     {
         if (isValidDate(month, day + 1, year))
             return new Date(month, day + 1, year);
@@ -209,7 +165,7 @@ public class Date implements Comparable<Date>
      * The date corresponding to the previous valid day.
      * @return The previous valid date.
      */
-    public Date getPreviousDate()
+    public Date getPreviousDay()
     {
         if (day - 1 > 0)
             return new Date(month, day - 1, year);
@@ -217,6 +173,32 @@ public class Date implements Comparable<Date>
             return new Date(month - 1, getMaxDay(month, year), year);
         else
             return new Date(12, getMaxDay(12, year + 1), year + 1);
+    }
+
+    /**
+     * The date corresponding to the day next week.
+     * @return The date next week.
+     */
+    public Date getNextWeek()
+    {
+        Date nextDay = getNextDay();
+        for (int i = 0; i < 6; i++)
+            nextDay = nextDay.getNextDay();
+        return nextDay;
+    }
+
+    /**
+     * The date corresponding to the next month, where the maximum
+     * day of that month will be used in place of larger days.
+     * @return
+     */
+    public Date getNextMonth()
+    {
+        int nextMonth = (month == 12) ? 1 : month + 1;
+        int newYear = (nextMonth == 1) ? year + 1 : year;
+        int maxDay = getMaxDay(nextMonth, newYear);
+        int newDay = (day > maxDay) ? maxDay : day;
+        return new Date(nextMonth, newDay, newYear);
     }
 
     /**
@@ -232,9 +214,9 @@ public class Date implements Comparable<Date>
      * Gives the date in the format YYYYMMDD.
      * @return A date in the format YYYYMMDD.
      */
-    public int getConcatenatedDate()
+    public String getConcatenatedDate()
     {
-        return Integer.parseInt(String.format("%4d%2d%2d", month, day, year));
+        return String.format("%4d%02d%02d", year, month, day);
     }
 
     /**
@@ -258,7 +240,7 @@ public class Date implements Comparable<Date>
     @Override
     public int hashCode()
     {
-        return getConcatenatedDate();
+        return Integer.parseInt(getConcatenatedDate());
     }
 
     /**
@@ -286,5 +268,49 @@ public class Date implements Comparable<Date>
         else if (year > date.year)
             return 1;
         return -1;
+    }
+
+    /**
+     * Checks whether the provided date is valid or not.
+     * @param month An integer ranging from 1 to 12 to represent the month.
+     * @param day An integer to represent the day of the month.
+     * @param year An integer to represent the year.
+     * @return True if the date is valid, false otherwise.
+     */
+    private static boolean isValidDate(int month, int day, int year)
+    {
+        if (month < 1 || month > 12)
+            return false;
+        if (day < 1 || day > getMaxDay(month, year))
+            return false;
+        return true;
+    }
+
+    /**
+     * Gets the maximum day on a given month on a given year.
+     * @param month The month, in the range [1, 12].
+     * @param year The year.
+     * @return The maximum day of this month.
+     */
+    public static int getMaxDay(int month, int year)
+    {
+        int maxDay;
+        switch (month)
+        {
+            case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+                maxDay = 31;
+                break;
+            case 4: case 6: case 9: case 11:
+                maxDay = 30;
+                break;
+            default:
+                // Handle Leap Years
+                if (year % 4 == 0 && ((year % 100 != 0) || (year % 400 == 0)))
+                    maxDay = 29;
+                else
+                    maxDay = 28;
+                break;
+        }
+        return maxDay;
     }
 }

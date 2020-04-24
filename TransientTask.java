@@ -1,3 +1,6 @@
+import java.util.Map;
+import java.util.HashMap;
+
 /**
  * A task object to represent tasks that only occur once on a specific date.
  */
@@ -6,6 +9,7 @@ public class TransientTask extends Task
     public static final String[] validCategories = {"Visit", "Shopping", "Appointment"};
 
     private Date activeDate;
+    private Map<Date, Timeframe> activeTimes;
 
     /**
      * Initializes a transient task.
@@ -19,6 +23,41 @@ public class TransientTask extends Task
     {
         super(taskName, category, timeframe);
         this.activeDate = new Date(date);
+        generateActiveTimes();
+    }
+
+    /**
+     * Adds a date to the set of those this task affects,
+     * adding the next consecutive date if necessary as well.
+     * 
+     * @param date The date the task will be active.
+     * @param timeframe The original timeframe of the task.
+     * @param nextDayRunoff The number of minutes the task runs into the next day.
+     */
+    private void generateActiveTimes()
+    {
+        activeTimes = new HashMap<>();
+        Timeframe timeframe = getGeneralTimeframe();
+        int nextDayRunoff = timeframe.getNextDayRunoff();
+        if (nextDayRunoff > 0)
+        {
+            activeTimes.put(activeDate, timeframe.truncate(false));
+            activeTimes.put(activeDate.getNextDay(), timeframe.truncate(true));
+        }
+        else
+            activeTimes.put(activeDate, timeframe);
+    }
+
+    /**
+     * Returns a copy of the dates and corresponding timeframes
+     * this task will be active. Tasks that extend into a second day
+     * have been accounted for and their timeframes have been truncated
+     * according to each of the applicable days.
+     */
+    @Override
+    public Map<Date, Timeframe> getScheduledTimes()
+    {
+        return new HashMap<Date, Timeframe>(activeTimes);
     }
 
     @Override

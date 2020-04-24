@@ -1,3 +1,6 @@
+import java.util.Map;
+import java.util.Set;
+
 /**
  * This is an abstraction for a task that has methods and variables common to all tasks
  * but lacks a specific implementation for determining which dates the task is active.
@@ -9,6 +12,7 @@ public abstract class Task
 
     /**
      * Initializes a task given a name, starting time, and duration.
+     * 
      * @param taskName The name of the task.
      * @param category The name of the category this task is part of.
      * @param timeframe The timeframe of the task.
@@ -23,6 +27,7 @@ public abstract class Task
 
     /**
      * Renames the task.
+     * 
      * @param taskName The new name of the task.
      */
     public void setTaskName(String taskName)
@@ -32,6 +37,7 @@ public abstract class Task
 
     /**
      * Changes the category.
+     * 
      * @param category The new category of the task.
      * @throws InvalidTaskException If the provided category is not valid.
      */
@@ -50,6 +56,7 @@ public abstract class Task
 
     /**
      * Changes the task starting time.
+     * 
      * @param startingTime A time ranging from 0 to 1440 minutes (24 hours) to represent the start of the timeframe.
      */
     public void setStartingTime(int startingTime)
@@ -59,6 +66,7 @@ public abstract class Task
 
     /**
      * Changes the duration of the task.
+     * 
      * @param duration The duration of the activity in minutes.
      */
     public void setDuration(int duration)
@@ -68,6 +76,7 @@ public abstract class Task
 
     /**
      * Gets the category of the task.
+     * 
      * @return The category of the task.
      */
     public String getCategory()
@@ -76,16 +85,35 @@ public abstract class Task
     }
 
     /**
-     * Gets the timeframe of the task.
+     * Gets the general timeframe of the task.
+     * 
      * @return A timeframe object holding the starting time and duration of the task.
      */
-    public Timeframe getTimeframe()
+    public Timeframe getGeneralTimeframe()
     {
         return timeSlot;
     }
 
     /**
-     * Explicitly gets the name of the task.
+     * Gets the timeframe of a task specific to a particular day.
+     * If a task runs into the next day then getting the daily
+     * timeframe will only get the portion applicable to that specific day.
+     * 
+     * @param date The date to get the active timeframe for.
+     * @return The timeframe specific to the particular day
+     *         or null if the task has no times on the given day.
+     */
+    public Timeframe getDailyTimeframe(Date date)
+    {
+        Map<Date, Timeframe> times = getScheduledTimes();
+        if (times.containsKey(date))
+            return times.get(date);
+        return null;
+    }
+
+    /**
+     * Gets the name of the task.
+     * 
      * @return The name of the task.
      */
     public String getTaskName()
@@ -94,12 +122,34 @@ public abstract class Task
     }
 
     /**
+     * A general method to determine whether two tasks conflict or not.
+     * @param task The task to compare against.
+     * @return True if the tasks conflict, false otherwise.
+     */
+    public boolean conflictsWith(Task task)
+    {
+        Map<Date, Timeframe> times = getScheduledTimes();
+        Map<Date, Timeframe> otherTimes = task.getScheduledTimes();
+        Set<Date> sharedDates = times.keySet();
+        sharedDates.retainAll(otherTimes.keySet());
+        if (sharedDates.size() > 0)
+        {
+            for (Date sharedDate : sharedDates)
+            {
+                if (times.get(sharedDate).conflictsWith(otherTimes.get(sharedDate)))
+                    return true;
+            }
+        }
+        return false; 
+    }
+
+    /**
      * Checks whether the timeframe of this task conflicts with that of the given task.
      * Note: This does not consider conflicting dates, only time slots.
      * @param task The task to compare against this one.
      * @return True if there is a time slot conflict, false otherwise.
      */
-    public boolean hasConflictingTimeframesWith(Task task)
+    public boolean timeFrameConflictsWith(Task task)
     {
         return timeSlot.conflictsWith(task.timeSlot);
     }
@@ -110,9 +160,19 @@ public abstract class Task
      * @param timeframe The timeframe tio compare against this one.
      * @return True if there is a time slot conflict, false otherwise.
      */
-    public boolean hasConflictingTimeframesWith(Timeframe timeframe)
+    public boolean timeFrameConflictsWith(Timeframe timeframe)
     {
         return timeSlot.conflictsWith(timeframe);
+    }
+
+    /**
+     * Returns a hash code for quick name lookup.
+     * @return A hash code for the task.
+     */
+    @Override
+    public int hashCode()
+    {
+        return taskName.hashCode();
     }
 
     /**
@@ -132,6 +192,13 @@ public abstract class Task
      */
     public abstract boolean isActiveOn(Date date);
     
+    /**
+     * Generates the dates this task is active along
+     * with their corresponding timeframes.
+     * @return A mapping of active dates to the corresponding active times.
+     */
+    public abstract Map<Date, Timeframe> getScheduledTimes();
+
     /**
      * Gets an array of valid categories for the task.
      * @return An array of valid categories for the task.
