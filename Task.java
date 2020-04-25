@@ -103,9 +103,9 @@ public abstract class Task
      * @return The timeframe specific to the particular day
      *         or null if the task has no times on the given day.
      */
-    public Timeframe getDailyTimeframe(Date date)
+    public Set<Timeframe> getDailyTimeframes(Date date)
     {
-        Map<Date, Timeframe> times = getScheduledTimes();
+        Map<Date, Set<Timeframe>> times = getScheduledTimes();
         if (times.containsKey(date))
             return times.get(date);
         return null;
@@ -128,16 +128,22 @@ public abstract class Task
      */
     public boolean conflictsWith(Task task)
     {
-        Map<Date, Timeframe> times = getScheduledTimes();
-        Map<Date, Timeframe> otherTimes = task.getScheduledTimes();
+        Map<Date, Set<Timeframe>> times = getScheduledTimes();
+        Map<Date, Set<Timeframe>> otherTimes = task.getScheduledTimes();
         Set<Date> sharedDates = times.keySet();
         sharedDates.retainAll(otherTimes.keySet());
         if (sharedDates.size() > 0)
         {
             for (Date sharedDate : sharedDates)
             {
-                if (times.get(sharedDate).conflictsWith(otherTimes.get(sharedDate)))
-                    return true;
+                for (Timeframe time : times.get(sharedDate))
+                {
+                    for (Timeframe otherTime : otherTimes.get(sharedDate))
+                    {
+                        if (time.conflictsWith(otherTime))
+                            return true;
+                    }
+                }
             }
         }
         return false; 
@@ -197,7 +203,7 @@ public abstract class Task
      * with their corresponding timeframes.
      * @return A mapping of active dates to the corresponding active times.
      */
-    public abstract Map<Date, Timeframe> getScheduledTimes();
+    public abstract Map<Date, Set<Timeframe>> getScheduledTimes();
 
     /**
      * Gets an array of valid categories for the task.

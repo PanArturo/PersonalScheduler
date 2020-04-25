@@ -15,7 +15,7 @@ public class RecurringTask extends Task
     private TaskFrequency frequency;
 
     private Set<AntiTask> antiTasks;
-    private Map<Date, Timeframe> activeTimes;
+    private Map<Date, Set<Timeframe>> activeTimes;
 
     /**
      * Initializes a recurring task.
@@ -166,11 +166,29 @@ public class RecurringTask extends Task
     {
         if (nextDayRunoff > 0)
         {
-            activeTimes.put(date, timeframe.truncate(false));
-            activeTimes.put(date.getNextDay(), timeframe.truncate(true));
+            addDailyTimeframe(date, timeframe.truncate(false));
+            addDailyTimeframe(date.getNextDay(), timeframe.truncate(true));
         }
         else
-            activeTimes.put(date, timeframe);
+            addDailyTimeframe(date, timeframe);
+    }
+
+    /**
+     * Adds a daily timeframe to the corresponding date.
+     * @param date The date to associate the timeframe with.
+     * @param timeframe The timeframe to add.
+     */
+    private void addDailyTimeframe(Date date, Timeframe timeframe)
+    {
+        Set<Timeframe> dailyTimeframes;
+        if (!activeTimes.containsKey(date))
+        {
+            dailyTimeframes = new HashSet<>();
+            activeTimes.put(date, dailyTimeframes);
+        }
+        else
+            dailyTimeframes = activeTimes.get(date);
+        dailyTimeframes.add(timeframe);
     }
 
     /**
@@ -180,9 +198,9 @@ public class RecurringTask extends Task
      * according to each of the applicable days.
      */
     @Override
-    public Map<Date, Timeframe> getScheduledTimes()
+    public Map<Date, Set<Timeframe>> getScheduledTimes()
     {
-        return new HashMap<Date, Timeframe>(activeTimes);
+        return new HashMap<Date, Set<Timeframe>>(activeTimes);
     }
 
     /**

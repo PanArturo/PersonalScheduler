@@ -75,18 +75,24 @@ public class Schedule
      */
     private void generalAddTask(Task newTask)
     {
-        Map<Date, Timeframe> newTimes = newTask.getScheduledTimes();
+        Map<Date, Set<Timeframe>> newTimes = newTask.getScheduledTimes();
         Set<Date> newDates = newTimes.keySet();
         // Check For Conflicts
         for (Date date : newDates)
         {
             if (calendar.containsKey(date))
             {
-                Timeframe dailyTimeframe = newTimes.get(date);
+                Set<Timeframe> dailyTimeframes = newTimes.get(date);
                 for (Task existingTask : calendar.get(date))
                 {
-                    if (existingTask.getDailyTimeframe(date).conflictsWith(dailyTimeframe))
-                        throw new TaskConflictException(newTask, existingTask);
+                    for (Timeframe timeframe : dailyTimeframes)
+                    {
+                        for (Timeframe existTimeframe : existingTask.getDailyTimeframes(date))
+                        {
+                            if (timeframe.conflictsWith(existTimeframe))
+                                throw new TaskConflictException(newTask, existingTask);
+                        }
+                    }
                 }
             }
         }
@@ -134,7 +140,7 @@ public class Schedule
      */
     private void generalRemoveTask(Task removeTask)
     {
-        Map<Date, Timeframe> times = removeTask.getScheduledTimes();
+        Map<Date, Set<Timeframe>> times = removeTask.getScheduledTimes();
         Set<Date> dates = times.keySet();
         for (Date date : dates)
             calendar.get(date).remove(removeTask);

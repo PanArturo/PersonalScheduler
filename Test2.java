@@ -1,10 +1,10 @@
 import java.util.Set;
 
 /**
- * A quick example of various runtime exceptions and
- * a conflict between a transient and recurring task.
+ * A quick example of a daily recurring task that extends into the next day,
+ * which effectively makes the task have two timeframes in a single day.
  */
-public class Test
+public class Test2
 {
     public static void main(String[] args)
     {
@@ -14,72 +14,33 @@ public class Test
         Date endingDate;
         Timeframe taskTimeframe;
         Timeframe otherTaskTimeframe;
-        RecurringTask recurringTask;
-        TransientTask conflictingTransientTask;
+        RecurringTask weeklyRecurringTask;
+        RecurringTask dailyRecurringTask;
         TransientTask transientTask;
 
-        // Bad Date Example
-        try
-        {
-            startingDate = new Date(1, 32, 2020);
-        }
-        catch (InvalidDateException e)
-        {
-            System.out.println(e.getMessage());
-        }
 
         // Set Dates
         startingDate = new Date(1, 3, 2020);
         endingDate = startingDate.getNextMonth();
 
-        // Bad Timeframe Example
-        try
-        {
-            taskTimeframe = new Timeframe(1415, 15);
-        }
-        catch (InvalidTimeframeException e)
-        {
-            System.out.println(e.getMessage());
-        }
-
-        // Another Bad Timeframe Example
-        try
-        {
-            taskTimeframe = new Timeframe(1380, 10);
-        }
-        catch (InvalidTimeframeException e)
-        {
-            System.out.println(e.getMessage());
-        }
-
         // Set Timeframe
         taskTimeframe = new Timeframe(1380, 120);
         otherTaskTimeframe = new Timeframe(0, 450);
 
-        // Bad Category Example
-        try
-        {
-            recurringTask = new RecurringTask("Recurring", "Random", taskTimeframe,
-                                              startingDate, endingDate, TaskFrequency.WEEKLY);
-        }
-        catch (InvalidTaskException e)
-        {
-            System.out.println(e.getMessage());
-        }
-
         // Set Tasks
-        recurringTask = new RecurringTask("Recurring", "Study", taskTimeframe,
+        weeklyRecurringTask = new RecurringTask("Weekly", "Study", taskTimeframe,
                                           startingDate, endingDate, TaskFrequency.WEEKLY);
-        conflictingTransientTask = new TransientTask("Conflict", "Visit", taskTimeframe, startingDate);
+        dailyRecurringTask = new RecurringTask("Daily", "Sleep", taskTimeframe,
+                                                                     startingDate.getNextDay(), endingDate.getNextMonth(), TaskFrequency.DAILY);
         transientTask = new TransientTask("Transient", "Visit", otherTaskTimeframe, startingDate);
         
         // Add To Schedule
-        schedule.addTask(recurringTask);
+        schedule.addTask(dailyRecurringTask);
 
         // Task Conflict Example
         try
         {
-            schedule.addTask(conflictingTransientTask);
+            schedule.addTask(weeklyRecurringTask);
         }
         catch (TaskConflictException e)
         {

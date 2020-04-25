@@ -1,3 +1,5 @@
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -9,7 +11,7 @@ public class TransientTask extends Task
     public static final String[] validCategories = {"Visit", "Shopping", "Appointment"};
 
     private Date activeDate;
-    private Map<Date, Timeframe> activeTimes;
+    private Map<Date, Set<Timeframe>> activeTimes;
 
     /**
      * Initializes a transient task.
@@ -27,25 +29,39 @@ public class TransientTask extends Task
     }
 
     /**
-     * Adds a date to the set of those this task affects,
-     * adding the next consecutive date if necessary as well.
-     * 
-     * @param date The date the task will be active.
-     * @param timeframe The original timeframe of the task.
-     * @param nextDayRunoff The number of minutes the task runs into the next day.
+     * Generates a mapping of dates this task is active
+     * to the corresponding timeframes the task will take place.
+     * This includes dates affected by tasks from the previous day.
+     * This method must be called again if changes are made to the task dates/times.
      */
     private void generateActiveTimes()
     {
         activeTimes = new HashMap<>();
+        Set<Timeframe> dailyTimeframes;
+        dailyTimeframes = new HashSet<>();
+        activeTimes.put(activeDate, dailyTimeframes);
         Timeframe timeframe = getGeneralTimeframe();
         int nextDayRunoff = timeframe.getNextDayRunoff();
         if (nextDayRunoff > 0)
         {
-            activeTimes.put(activeDate, timeframe.truncate(false));
-            activeTimes.put(activeDate.getNextDay(), timeframe.truncate(true));
+            addDailyTimeframe(activeDate, timeframe.truncate(false));
+            addDailyTimeframe(activeDate.getNextDay(), timeframe.truncate(true));
         }
         else
-            activeTimes.put(activeDate, timeframe);
+            addDailyTimeframe(activeDate, timeframe);
+    }
+
+    /**
+     * Adds a daily timeframe to the corresponding date.
+     * @param date The date to associate the timeframe with.
+     * @param timeframe The timeframe to add.
+     */
+    private void addDailyTimeframe(Date date, Timeframe timeframe)
+    {
+        Set<Timeframe> dailyTimeframes;
+        dailyTimeframes = new HashSet<>();
+        activeTimes.put(date, dailyTimeframes);
+        dailyTimeframes.add(timeframe);
     }
 
     /**
@@ -55,9 +71,9 @@ public class TransientTask extends Task
      * according to each of the applicable days.
      */
     @Override
-    public Map<Date, Timeframe> getScheduledTimes()
+    public Map<Date, Set<Timeframe>> getScheduledTimes()
     {
-        return new HashMap<Date, Timeframe>(activeTimes);
+        return new HashMap<Date, Set<Timeframe>>(activeTimes);
     }
 
     @Override
