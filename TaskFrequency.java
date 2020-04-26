@@ -20,4 +20,20 @@ public enum TaskFrequency
     {
         return value;
     }
+
+    /**
+     * Gets the enum constant corresponding to the given value.
+     * @param value The value associated with the enum constant.
+     * @return The corresponding enum constant, defaulting to MONTHLY
+     *         in the case of an invalid input.
+     */
+    public static TaskFrequency getFrequency(int value)
+    {
+        if (value == 1)
+            return TaskFrequency.DAILY;
+        else if (value == 7)
+            return TaskFrequency.WEEKLY;
+        else
+            return TaskFrequency.MONTHLY;
+    }
 }
