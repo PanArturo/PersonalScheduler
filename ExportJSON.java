@@ -9,20 +9,18 @@ public class ExportJSON {
 
     public void Export(Schedule schedulePassed){
 
-        // Get calendar map keyset
-        Set<Date> keySetpr = schedulePassed.calendar.keySet();
-
-        // For each date in hashmap, place hashset into temp and write to json
-        for (Date outerMap : keySetpr) {
-            Set<Task> taskTemp;
-            taskTemp = schedulePassed.calendar.get(outerMap);
+        Set<RecurringTask> RecTasks = schedulePassed.getRecurringTasks();
+        Set<TransientTask> TransTasks = schedulePassed.getTransientTasks();
+        Set<AntiTask> AntiTasks = schedulePassed.getAntiTasks();
 
             try {
 
                 Writer writer = new FileWriter("Schedule.json");
 
                 // convert taskTemp to JSON file
-                new Gson().toJson(taskTemp, writer);
+                new Gson().toJson(RecTasks, writer);
+                new Gson().toJson(TransTasks, writer);
+                new Gson().toJson(AntiTasks, writer);
 
                 writer.close();
 
@@ -32,4 +30,4 @@ public class ExportJSON {
 
         }
     }
-}
+

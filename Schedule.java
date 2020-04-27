@@ -10,7 +10,7 @@ import java.util.HashSet;
 public class Schedule
 {
     // Contains Daily Tasks & Duplicate References For Tasks On Multiple Days
-    public Map<Date, Set<Task>> calendar;
+    private Map<Date, Set<Task>> calendar;
 
     // Sets Of Every Scheduled Task
     private Set<TransientTask> transientTasks;
