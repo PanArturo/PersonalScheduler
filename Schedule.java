@@ -10,7 +10,7 @@ import java.util.HashSet;
 public class Schedule
 {
     // Contains Daily Tasks & Duplicate References For Tasks On Multiple Days
-    public Map<Date, Set<Task>> calendar;
+    private Map<Date, Set<Task>> calendar;
 
     // Sets Of Every Scheduled Task
     private Set<TransientTask> transientTasks;
@@ -68,14 +68,14 @@ public class Schedule
     }
 
     /**
-     * Adds a antitask task to the schedule.
+     * Adds a anti-task task to the schedule.
      *
-     * @param newTask The recurring task to add to the schedule.
-     * @throws TaskConflictException If an existing task conflicts with the one being added.
+     * @param newTask The anti-task to add to the schedule.
+     * @throws InvalidTaskException If the anti-task does not properly correspond to a recurring task.
      */
     public void addTask(AntiTask newTask)
     {
-
+        // Implementation Pending
     }
 
     /**
