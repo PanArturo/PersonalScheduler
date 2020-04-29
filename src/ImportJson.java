@@ -9,14 +9,14 @@ import com.google.gson.stream.JsonReader;
 public class ImportJson
 {
     Schedule currentSched = new Schedule();
-    private String Name;
-    private String Type;
-    private String StartDate;
-    private int StartTime;
-    private double Duration;
-    private String EndDate;
-    private int Frequency;
-    private String Date;
+    private String name;
+    private String type;
+    private String startDate;
+    private int startTime;
+    private double duration;
+    private String endDate;
+    private int frequency;
+    private String date;
 
     //From UI: call this method
     public Schedule getFromUI(File passed)
@@ -63,40 +63,40 @@ public class ImportJson
             for (ImportJson importJSON : scheduleList)
             {
                 //Transient = true
-                if (!(importJSON.Type.equals("Cancellation")) && (importJSON.EndDate == null))
+                if (!(importJSON.type.equals("Cancellation")) && (importJSON.endDate == null))
                 {
-                    String StartDate = importJSON.Date;
+                    String StartDate = importJSON.date;
                     int day = Integer.parseInt(StartDate.substring(6));
                     int month = Integer.parseInt(StartDate.substring(4, 6));
                     int year = Integer.parseInt(StartDate.substring(0, 4));
-                    new TransientTask("Transient", importJSON.Type, new Timeframe(importJSON.StartTime,
-                            importJSON.Duration), new Date(month, day, year));
-                    currentSched.addTask(new TransientTask("Transient", importJSON.Type, new Timeframe(importJSON.StartTime,
-                            importJSON.Duration), new Date(month, day, year)));
+                    new TransientTask("Transient", importJSON.type, new Timeframe(importJSON.startTime,
+                            importJSON.duration), new Date(month, day, year));
+                    currentSched.addTask(new TransientTask("Transient", importJSON.type, new Timeframe(importJSON.startTime,
+                            importJSON.duration), new Date(month, day, year)));
                 }
 
                 //Recurring = true
-                else if (!(importJSON.Type.equals("Cancellation")) && !(importJSON.Frequency == 0)) {
-                    String StartDate2 = importJSON.StartDate;
-                    int dayBegin = Integer.parseInt(StartDate2.substring(6));
-                    int monthBegin = Integer.parseInt(StartDate2.substring(4, 6));
-                    int yearBegin = Integer.parseInt(StartDate2.substring(0, 4));
-                    String EndDate = importJSON.EndDate;
-                    int dayEnd = Integer.parseInt(EndDate.substring(6));
-                    int monthEnd = Integer.parseInt(EndDate.substring(4, 6));
-                    int yearEnd = Integer.parseInt(EndDate.substring(0, 4));
+                else if (!(importJSON.type.equals("Cancellation")) && !(importJSON.frequency == 0)) {
+                    String startDate2 = importJSON.startDate;
+                    int dayBegin = Integer.parseInt(startDate2.substring(6));
+                    int monthBegin = Integer.parseInt(startDate2.substring(4, 6));
+                    int yearBegin = Integer.parseInt(startDate2.substring(0, 4));
+                    String endDate = importJSON.endDate;
+                    int dayEnd = Integer.parseInt(endDate.substring(6));
+                    int monthEnd = Integer.parseInt(endDate.substring(4, 6));
+                    int yearEnd = Integer.parseInt(endDate.substring(0, 4));
 
-                    currentSched.addTask(new RecurringTask("Recurring", importJSON.Type, new Timeframe(importJSON.StartTime,
-                            importJSON.Duration),
-                            new Date(monthBegin, dayBegin, yearBegin), new Date(monthEnd, dayEnd, yearEnd), TaskFrequency.getFrequency(importJSON.Frequency)));
+                    currentSched.addTask(new RecurringTask("Recurring", importJSON.type, new Timeframe(importJSON.startTime,
+                            importJSON.duration),
+                            new Date(monthBegin, dayBegin, yearBegin), new Date(monthEnd, dayEnd, yearEnd), TaskFrequency.getFrequency(importJSON.frequency)));
                 }
                 //Anti Task
                 else {
-                    String StartDate3 = importJSON.Date;
-                    int day3 = Integer.parseInt(StartDate.substring(6));
-                    int month3 = Integer.parseInt(StartDate.substring(4, 6));
-                    int year3 = Integer.parseInt(StartDate.substring(0, 4));
-                    currentSched.addTask(new AntiTask(importJSON.Name, new Timeframe(importJSON.StartTime, importJSON.Duration), new Date(month3, day3, year3)));
+                    String startDate3 = importJSON.date;
+                    int day3 = Integer.parseInt(startDate.substring(6));
+                    int month3 = Integer.parseInt(startDate.substring(4, 6));
+                    int year3 = Integer.parseInt(startDate.substring(0, 4));
+                    currentSched.addTask(new AntiTask(importJSON.name, new Timeframe(importJSON.startTime, importJSON.duration), new Date(month3, day3, year3)));
 
                 }
             }

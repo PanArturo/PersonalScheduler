@@ -8,17 +8,17 @@ public class ExportJson
 {
     public void export(Schedule schedulePassed)
     {
-        Set<RecurringTask> RecTasks = schedulePassed.getRecurringTasks();
-        Set<TransientTask> TransTasks = schedulePassed.getTransientTasks();
-        Set<AntiTask> AntiTasks = schedulePassed.getAntiTasks();
+        Set<RecurringTask> recurringTasks = schedulePassed.getRecurringTasks();
+        Set<TransientTask> transientTasks = schedulePassed.getTransientTasks();
+        Set<AntiTask> antiTasks = schedulePassed.getAntiTasks();
         try
         {
             Writer writer = new FileWriter("Schedule.json");
 
             // convert taskTemp to JSON file
-            new Gson().toJson(RecTasks, writer);
-            new Gson().toJson(TransTasks, writer);
-            new Gson().toJson(AntiTasks, writer);
+            new Gson().toJson(recurringTasks, writer);
+            new Gson().toJson(transientTasks, writer);
+            new Gson().toJson(antiTasks, writer);
 
             writer.close();
 
