@@ -54,8 +54,10 @@ public class RecurringTask extends Task
     }
 
     /**
-     * Determines whether an anti-task affects this recurring task on a particular
-     * date.
+     * Determines whether an anti-task affects this recurring task on a
+     * particular date.
+     * CAUTION: A recurring task may still be active on dates with an anti-task if
+     *          the recurring task has multiple timeframes on that date!
      * 
      * @param date The date to check.
      * @return True if an anti-task is active on this date, false otherwise.
@@ -71,33 +73,110 @@ public class RecurringTask extends Task
     }
 
     /**
+     * Returns a set of dates on which this recurring task is affected by
+     * an anti-task.
+     * CAUTION: A recurring task may still be active on these dates if the recurring
+     *          task has multiple timeframes on that date!
+     * 
+     * @return A set of dates on which the recurring task is affected by an anti-task.
+     */
+    public Set<Date> getAntiTaskDates()
+    {
+        Set<Date> antiTaskDates = new HashSet<>();
+        for (AntiTask t : antiTasks)
+            antiTaskDates.add(t.getActiveDate());
+        return antiTaskDates;
+    }
+
+    /**
      * Attaches an anti-task to the recurring task.
+     * If the anti-task is valid, the occurence of this recurring task
+     * corresponding to the anti-task is canceled.
+     * CAUTION: Do not independently call this method, the schedule must
+     *          be updated to properly reflect these changes.
      * 
      * @param antiTask The anti-task to attach to the recurring task.
+     * @return A set of affected dates along with updated timeframes.
+     *         This allows us to only modify the necessary dates in the schedule.
      * @throws InvalidTaskException If the anti-task does not exactly cancel a
      *                              occurence of the recurring task or that
      *                              occurence has already been canceled by an
      *                              existing anti-task.
      */
-    public void addAntiTask(AntiTask antiTask)
+    public Map<Date, Set<Timeframe>> addAntiTask(AntiTask antiTask)
     {
+        Date antiTaskDate = antiTask.getActiveDate();
+        Timeframe antiTaskTimeframe = antiTask.getGeneralTimeframe();
         for (AntiTask t : antiTasks)
         {
             if (antiTask.timeFrameConflictsWith(t))
                 throw new InvalidTaskException("An anti-task " + t.getTaskName()
                         + " already cancels the recurring task " + getTaskName() + " at this time.");
         }
-        if (!isActiveOn(antiTask.getActiveDate()))
+        if (!isActiveOn(antiTaskDate))
         {
             throw new InvalidTaskException("The recurring task " + getTaskName()
                     + " is not active on the date of the anti-task " + antiTask.getTaskName() + ".");
         }
-        if (!getGeneralTimeframe().equals(antiTask.getGeneralTimeframe()))
+        if (!getGeneralTimeframe().equals(antiTaskTimeframe))
         {
             throw new InvalidTaskException("The recurring task " + getTaskName()
                     + " has a different timeframe than the anti-task " + antiTask.getTaskName() + ".");
         }
         antiTasks.add(antiTask);
+        antiTask.setCancelledTask(this);
+        removeScheduledDate(antiTaskDate, antiTaskTimeframe, antiTaskTimeframe.getNextDayRunoff());
+        // Return Updated Timeframes
+        Date date = antiTask.getActiveDate();
+        Timeframe timeframe = getGeneralTimeframe();
+        int nextDayRunoff = timeframe.getNextDayRunoff();
+        Map<Date, Set<Timeframe>> updatedTimes = new HashMap<>();
+        updatedTimes.put(date, new HashSet<>(activeTimes.get(date)));
+        if (nextDayRunoff > 0)
+        {
+            Date nextDay = date.getNextDay();
+            updatedTimes.put(nextDay, new HashSet<>(activeTimes.get(nextDay)));
+        }
+        return updatedTimes;   
+    }
+
+    /**
+     * Detaches an anti-task from this recurring task.
+     * If the anti-task is valid, the occurence of this recurring task
+     * corresponding to the anti-task is restored.
+     * CAUTION: Do not independently call this method, the schedule must
+     *          be updated to properly reflect these changes.
+     * 
+     * @param antiTask The anti-task to attach to the recurring task.
+     * @return A set of affected dates along with updated timeframes.
+     *         This allows us to only modify the necessary dates in the schedule.
+     * @throws InvalidTaskException If the anti-task does not exactly cancel a
+     *                              occurence of the recurring task or that
+     *                              occurence has already been canceled by an
+     *                              existing anti-task.
+     */
+    public Map<Date, Set<Timeframe>> removeAntiTask(AntiTask antiTask)
+    {
+        if (!antiTasks.contains(antiTask))
+        {
+            throw new InvalidTaskException("The anti-task " + antiTask.getTaskName() + " does not apply to "
+                                           + getTaskName() + " and cannot be removed from it!");
+        }
+        Date date = antiTask.getActiveDate();
+        Timeframe timeframe = getGeneralTimeframe();
+        int nextDayRunoff = timeframe.getNextDayRunoff();
+        addTimesForDate(antiTask.getActiveDate(), timeframe, nextDayRunoff);
+        antiTasks.remove(antiTask);
+        antiTask.setCancelledTask(null);
+        // Return Updated Timeframes
+        Map<Date, Set<Timeframe>> updatedTimes = new HashMap<>();
+        updatedTimes.put(date, new HashSet<>(activeTimes.get(date)));
+        if (nextDayRunoff > 0)
+        {
+            Date nextDay = date.getNextDay();
+            updatedTimes.put(nextDay, new HashSet<>(activeTimes.get(nextDay)));
+        }
+        return updatedTimes;    
     }
 
     /**
@@ -142,9 +221,11 @@ public class RecurringTask extends Task
         Timeframe timeframe = getGeneralTimeframe();
         int nextDayRunoff = getGeneralTimeframe().getNextDayRunoff();
         Date currentDate = startingDate;
+        Set<Date> antiTaskDates = getAntiTaskDates();
         while (currentDate.compareTo(endingDate) <= 0)
         {
-            addScheduledDate(currentDate, timeframe, nextDayRunoff);
+            if (!antiTaskDates.contains(currentDate))
+                addTimesForDate(currentDate, timeframe, nextDayRunoff);
             if (frequency == TaskFrequency.DAILY)
                 currentDate = currentDate.getNextDay();
             else if (frequency == TaskFrequency.WEEKLY)
@@ -159,26 +240,27 @@ public class RecurringTask extends Task
      * adding the next consecutive date if necessary as well.
      * 
      * @param date The date the task will be active.
-     * @param timeframe The original timeframe of the task.
+     * @param generalTimeframe The original timeframe of the task.
      * @param nextDayRunoff The number of minutes the task runs into the next day.
      */
-    private void addScheduledDate(Date date, Timeframe timeframe, int nextDayRunoff)
+    private void addTimesForDate(Date date, Timeframe generalTimeframe, int nextDayRunoff)
     {
         if (nextDayRunoff > 0)
         {
-            addDailyTimeframe(date, timeframe.truncate(false));
-            addDailyTimeframe(date.getNextDay(), timeframe.truncate(true));
+            addDailyTimeframe(date, generalTimeframe.truncate(false));
+            addDailyTimeframe(date.getNextDay(), generalTimeframe.truncate(true));
         }
         else
-            addDailyTimeframe(date, timeframe);
+            addDailyTimeframe(date, generalTimeframe);
     }
 
     /**
      * Adds a daily timeframe to the corresponding date.
+     * 
      * @param date The date to associate the timeframe with.
-     * @param timeframe The timeframe to add.
+     * @param dailyTimeframe The timeframe to add.
      */
-    private void addDailyTimeframe(Date date, Timeframe timeframe)
+    private void addDailyTimeframe(Date date, Timeframe dailyTimeframe)
     {
         Set<Timeframe> dailyTimeframes;
         if (!activeTimes.containsKey(date))
@@ -188,7 +270,44 @@ public class RecurringTask extends Task
         }
         else
             dailyTimeframes = activeTimes.get(date);
-        dailyTimeframes.add(timeframe);
+        dailyTimeframes.add(dailyTimeframe);
+    }
+
+    /**
+     * Removes a starting date from the set of those this task affects,
+     * removing runoff into the next consecutive date if necessary as well.
+     * "Undoes" addScheduledDate for a particular date.
+     * 
+     * @param date The date the instance of the task begins on.
+     * @param generalTimeframe The original timeframe of the task.
+     * @param nextDayRunoff The number of minutes the task runs into the next day.
+     */
+    private void removeScheduledDate(Date date, Timeframe generalTimeframe, int nextDayRunoff)
+    {
+        if (nextDayRunoff > 0)
+        {
+            removeDailyTimeframe(date, generalTimeframe.truncate(false));
+            removeDailyTimeframe(date.getNextDay(), generalTimeframe.truncate(true));
+        }
+        else
+            removeDailyTimeframe(date, generalTimeframe);
+    }
+
+    /**
+     * Removes a daily timeframe from the corresponding date.
+     * "Undoes" addDailyTimeframe for a particular date and timeframe.
+     * 
+     * @param date The date to disassociate the timeframe with.
+     * @param dailyTimeframe The timeframe to remove.
+     */
+    private void removeDailyTimeframe(Date date, Timeframe dailyTimeframe)
+    {
+        if (activeTimes.containsKey(date))
+        {
+            Set<Timeframe> timeframes = activeTimes.get(date);
+            timeframes.remove(dailyTimeframe);
+            System.out.println();
+        }
     }
 
     /**
@@ -196,6 +315,8 @@ public class RecurringTask extends Task
      * this task will be active. Tasks that extend into a second day
      * have been accounted for and their timeframes have been truncated
      * according to each of the applicable days.
+     * 
+     * @return Every date and timeframe this task will be active.
      */
     @Override
     public Map<Date, Set<Timeframe>> getScheduledTimes()
@@ -205,6 +326,7 @@ public class RecurringTask extends Task
 
     /**
      * Gets an array of valid categories for the task.
+     * 
      * @return An array of valid categories for the task.
      */
     @Override

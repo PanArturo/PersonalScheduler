@@ -1,7 +1,9 @@
+import java.util.Objects;
+
 /**
  * The timeframe class holds a specific slot of time to make reporting/transferring times more intuitive.
  */
-public class Timeframe
+public class Timeframe implements Comparable<Timeframe>
 {
     private int startingTime;
     private int duration;
@@ -153,6 +155,48 @@ public class Timeframe
     private String getFormattedTime(int minutes)
     {
         return ((minutes / 60) % 24) + ":" + String.format("%02d", (minutes % 60));
+    }
+
+    /**
+     * Returns a hash code for this timeframe.
+     * @return A hashcode unique to the timeframe parameters.
+     */
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(startingTime, duration);
+    }
+
+    /**
+     * Checks to see whether two timeframes are equivalent.
+     * @param object The timeframe object to compare to this one.
+     * @return True if the timeframes are equivalent, false otherwise.
+     */
+    @Override
+    public boolean equals(Object object)
+    {
+        if (!(object instanceof Timeframe))
+            return false;
+        Timeframe t = (Timeframe) object;
+        return startingTime == t.startingTime && duration == t.duration;
+    }
+
+    /**
+     * Compares the starting times of two timeframes.
+     * 
+     * @return A negative integer if this timeframe begins before the given one,
+     *         zero if they begin at the same time,
+     *         or a positive integer if this timeframe begins after the given one.
+     */
+    @Override
+    public int compareTo(Timeframe otherTimeframe)
+    {
+        if (startingTime > otherTimeframe.startingTime)
+            return 1;
+        else if (startingTime == otherTimeframe.startingTime)
+            return 0;
+        else
+            return -1;
     }
 
     /**

@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 /**
  * A class to represent a specific date (day, month, year).
  */
@@ -220,57 +222,6 @@ public class Date implements Comparable<Date>
     }
 
     /**
-     * Checks to see whether two dates are equivalent.
-     * @param object The date object to compare to this one.
-     * @return True if the dates are equivalent, false otherwise.
-     */
-    @Override
-    public boolean equals(Object object)
-    {
-        if (!(object instanceof Date))
-            return false;
-        Date d = (Date) object;
-        return month == d.month && day == d.day && year == d.year;
-    }
-
-    /**
-     * Returns a value unique to this date suitable for use as a hash code.
-     * @return A value unique to this date.
-     */
-    @Override
-    public int hashCode()
-    {
-        return Integer.parseInt(getConcatenatedDate());
-    }
-
-    /**
-     * Checks whether a date is before, after, or equivalent to this date.
-     * @param date The date object to compare to this one.
-     * @return 1 if this date is after the given one,
-     *         0 if the dates are equivalent,
-     *         or -1 if this date is before the given one.
-     */
-    @Override
-    public int compareTo(Date date)
-    {
-        if (year == date.year)
-        {
-            if (month == date.month)
-            {
-                if (day == date.day)
-                    return 0;
-                else if (day > date.day)
-                    return 1;
-            }
-            else if (month > date.month)
-                return 1;
-        }
-        else if (year > date.year)
-            return 1;
-        return -1;
-    }
-
-    /**
      * Checks whether the provided date is valid or not.
      * @param month An integer ranging from 1 to 12 to represent the month.
      * @param day An integer to represent the day of the month.
@@ -312,5 +263,56 @@ public class Date implements Comparable<Date>
                 break;
         }
         return maxDay;
+    }
+
+    /**
+     * Checks to see whether two dates are equivalent.
+     * @param object The date object to compare to this one.
+     * @return True if the dates are equivalent, false otherwise.
+     */
+    @Override
+    public boolean equals(Object object)
+    {
+        if (!(object instanceof Date))
+            return false;
+        Date d = (Date) object;
+        return month == d.month && day == d.day && year == d.year;
+    }
+
+    /**
+     * Returns a hash code for this date.
+     * @return A hashcode unique to the date.
+     */
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(month, day, year);
+    }
+
+    /**
+     * Checks whether a date is before, after, or equivalent to this date.
+     * @param date The date object to compare to this one.
+     * @return 1 if this date is after the given one,
+     *         0 if the dates are equivalent,
+     *         or -1 if this date is before the given one.
+     */
+    @Override
+    public int compareTo(Date date)
+    {
+        if (year == date.year)
+        {
+            if (month == date.month)
+            {
+                if (day == date.day)
+                    return 0;
+                else if (day > date.day)
+                    return 1;
+            }
+            else if (month > date.month)
+                return 1;
+        }
+        else if (year > date.year)
+            return 1;
+        return -1;
     }
 }

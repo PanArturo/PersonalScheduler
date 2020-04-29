@@ -68,17 +68,6 @@ public class Schedule
     }
 
     /**
-     * Adds a anti-task task to the schedule.
-     *
-     * @param newTask The anti-task to add to the schedule.
-     * @throws InvalidTaskException If the anti-task does not properly correspond to a recurring task.
-     */
-    public void addTask(AntiTask newTask)
-    {
-        // Implementation Pending
-    }
-
-    /**
      * Adds a task to the calendar.
      * 
      * @param newTask The task to add to the calendar.
@@ -91,35 +80,80 @@ public class Schedule
         // Check For Conflicts
         for (Date date : newDates)
         {
-            if (calendar.containsKey(date))
+            Task conflictingTask = findConflictingTask(date, newTimes.get(date));
+            if (conflictingTask != null)
+                throw new TaskConflictException(newTask, conflictingTask);
+        }
+        // Add To Calendar
+        for (Date date : newDates)
+            addTaskOnDate(date, newTask);
+    }
+
+    /**
+     * Attempts to find an existing task in conflict with the
+     * provided timeframes on the given date.
+     * 
+     * @param date The date to search for timeframe conflicts.
+     * @param timeframes The potentially conflicting timeframes.
+     * @return A conflicting task if found, or null otherwise.
+     */
+    private Task findConflictingTask(Date date, Set<Timeframe> timeframes)
+    {
+        if (calendar.containsKey(date))
+        {
+            for (Task existingTask : calendar.get(date))
             {
-                Set<Timeframe> dailyTimeframes = newTimes.get(date);
-                for (Task existingTask : calendar.get(date))
+                for (Timeframe timeframe : timeframes)
                 {
-                    for (Timeframe timeframe : dailyTimeframes)
+                    for (Timeframe existingTimeframe : existingTask.getDailyTimeframes(date))
                     {
-                        for (Timeframe existTimeframe : existingTask.getDailyTimeframes(date))
-                        {
-                            if (timeframe.conflictsWith(existTimeframe))
-                                throw new TaskConflictException(newTask, existingTask);
-                        }
+                        if (timeframe.conflictsWith(existingTimeframe))
+                            return existingTask;
                     }
                 }
             }
         }
-        // Add To Calendar
-        for (Date date : newDates)
+        return null;
+    }
+
+    /**
+     * Attempts to find an existing task in conflict with the
+     * provided task on the given date, ignoring itself.
+     * 
+     * @param date The date to search for timeframe conflicts.
+     * @param task The potentially conflicting task.
+     * @return A conflicting task if found, or null otherwise.
+     */
+    private Task findConflictingTask(Date date, Task task)
+    {
+        if (calendar.containsKey(date))
         {
-            Set<Task> taskSet;
-            if (!calendar.containsKey(date))
+            for (Task existingTask : calendar.get(date))
             {
-                taskSet = new HashSet<>();
-                calendar.put(date, taskSet);
+                if (!task.equals(existingTask) && task.conflictsWith(existingTask))
+                    return existingTask;
             }
-            else
-                taskSet = calendar.get(date);
-            taskSet.add(newTask);
         }
+        return null;
+    }
+
+    /**
+     * Associates a task with the given date.
+     * 
+     * @param date The date to associate the task with.
+     * @param newTask The task to be associated with the date.
+     */
+    private void addTaskOnDate(Date date, Task newTask)
+    {
+        Set<Task> taskSet;
+        if (!calendar.containsKey(date))
+        {
+            taskSet = new HashSet<>();
+            calendar.put(date, taskSet);
+        }
+        else
+            taskSet = calendar.get(date);
+        taskSet.add(newTask);
     }
 
     /**
@@ -154,7 +188,93 @@ public class Schedule
         Map<Date, Set<Timeframe>> times = removeTask.getScheduledTimes();
         Set<Date> dates = times.keySet();
         for (Date date : dates)
+            removeTaskOnDate(date, removeTask);
+    }
+
+    /**
+     * Associates a task with the given date.
+     * 
+     * @param date The date to associate the task with.
+     * @param newTask The task to be associated with the date.
+     */
+    private void removeTaskOnDate(Date date, Task removeTask)
+    {
+        if (calendar.containsKey(date))
             calendar.get(date).remove(removeTask);
+    }
+
+    /**
+     * Adds a anti-task task.
+     *
+     * @param newTask The anti-task to add.
+     * @throws InvalidTaskException If the anti-task does not properly correspond to a recurring task.
+     */
+    public void addTask(AntiTask newTask)
+    {
+        Date antiTaskDate = newTask.getActiveDate();
+        if (!calendar.containsKey(antiTaskDate))
+        {
+            throw new InvalidTaskException("There are no tasks on " + antiTaskDate + " for the anti-task \""
+                                           + newTask.getTaskName()+ "\" to affect!");
+        }
+        Timeframe generalTimeframe = newTask.getGeneralTimeframe();
+        RecurringTask matchingTask = null;
+        Set<Task> dailyTasks = calendar.get(antiTaskDate);
+        for (Task existingTask : dailyTasks)
+        {
+            if (existingTask instanceof RecurringTask
+                && existingTask.getGeneralTimeframe().equals(generalTimeframe))
+            {
+                matchingTask = (RecurringTask) existingTask;
+                break;
+            }
+        }
+        if (matchingTask != null)
+        {
+            antiTasks.add(newTask);
+            Map<Date, Set<Timeframe>> affectedTimes = matchingTask.addAntiTask(newTask);
+            Set<Date> affectedDates = affectedTimes.keySet();
+            for (Date date : affectedDates)
+            {
+                if (affectedTimes.get(date).size() == 0)
+                    removeTaskOnDate(date, matchingTask);
+            }
+        }
+        else
+        {
+            throw new InvalidTaskException("There are no applicable tasks on " + antiTaskDate + " for the anti-task \""
+                                           + newTask.getTaskName()+ "\" to affect!");
+        }
+    }
+
+    /**
+     * Removes an anti-task.
+     * 
+     * @param removeTask The anti-task to remove.
+     * @throws TaskConflictException If the anti-task removal would cause task conflicts.
+     */
+    public void removeTask(AntiTask removeTask)
+    {
+        RecurringTask restoreTask = removeTask.getCancelledTask();
+        // Ensure the task can be restored without conflicts.
+        Map<Date, Set<Timeframe>> restoredTimes = restoreTask.removeAntiTask(removeTask);
+        Set<Date> affectedDates = restoredTimes.keySet();
+        for (Date date : affectedDates)
+        {
+            Task conflictingTask = findConflictingTask(date, restoreTask);
+            if (conflictingTask != null)
+            {
+                restoreTask.addAntiTask(removeTask);
+                throw new TaskConflictException("The anti-task could not be removed since this would "
+                                                + "cause the recurring task \"" + restoreTask.getTaskName()
+                                                + "\" to conflict with the task \"" + conflictingTask.getTaskName()
+                                                + "\", please remove the conflicting task to perform this operation.");
+            }
+        }
+        // Reassociate the recurring task with the affected dates.
+        for (Date date : affectedDates)
+            addTaskOnDate(date, restoreTask);
+        antiTasks.remove(removeTask);
     }
 
     /**
@@ -190,9 +310,26 @@ public class Schedule
     }
 
     /**
+     * Gets the first anti-task with the given name.
+     * 
+     * @param taskName The name of the task.
+     * @return A reference to the task, or null if not found.
+     */
+    public AntiTask getAntiTask(String taskName)
+    {
+        for (AntiTask task : antiTasks)
+        {
+            if (task.getTaskName().equals(taskName))
+                return task;
+        }
+        return null;
+    }
+
+    /**
      * Gets the first task with the given name.
      * Avoid using this when possible as it must
      * iterate through every possible task.
+     * Instead, use the type specific methods if possible.
      * 
      * @param taskName The name of the task.
      * @return A reference to the task, or null if not found.

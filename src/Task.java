@@ -1,4 +1,5 @@
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -178,7 +179,7 @@ public abstract class Task
     @Override
     public int hashCode()
     {
-        return taskName.hashCode();
+        return Objects.hash(taskName, category);
     }
 
     /**
