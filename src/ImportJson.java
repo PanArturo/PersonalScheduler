@@ -6,8 +6,8 @@ import com.google.gson.stream.JsonReader;
 
 
 // Requires Gson-2.8.6 dependency
-public class ImportJSON{
-
+public class ImportJson
+{
     Schedule currentSched = new Schedule();
     private String Name;
     private String Type;
@@ -19,10 +19,11 @@ public class ImportJSON{
     private String Date;
 
     //From UI: call this method
-    public Schedule getFromUI(File passed){
+    public Schedule getFromUI(File passed)
+    {
         //File location
         File imported = passed;
-        Importing(imported);
+        importing(imported);
 
         return currentSched;
     }
@@ -32,36 +33,38 @@ public class ImportJSON{
     //schedule.merge(test.passImport());
 
     //Constructor
-    public ImportJSON(String s) {
+    public ImportJson(String s)
+    {
         //File location
         File imported = new File(s);
-        Importing(imported);
+        importing(imported);
 
     }
 
     //In main: added example to instantiate the object and request merge to existing schedule
-    public Schedule passImport(){
+    public Schedule passImport()
+    {
         return currentSched;
     }
 
 
-    public void Importing(File importedSet) {
-
-        try {
-
+    public void importing(File importedSet)
+    {
+        try 
+        {
             //Creates an ArrayList of individual task objects
             //Iterate through list
             Gson gson = new Gson();
             JsonReader reader = new JsonReader(new FileReader(importedSet));
-            ImportJSON[] scheduleImported = new Gson().fromJson(reader, ImportJSON[].class);
-            List<ImportJSON> scheduleList = Arrays.asList(scheduleImported);
+            ImportJson[] scheduleImported = new Gson().fromJson(reader, ImportJson[].class);
+            List<ImportJson> scheduleList = Arrays.asList(scheduleImported);
 
             //Sort into appropriate task category then create task objects
-            for (ImportJSON importJSON : scheduleList) {
-
-
+            for (ImportJson importJSON : scheduleList)
+            {
                 //Transient = true
-                if (!(importJSON.Type.equals("Cancellation")) && (importJSON.EndDate == null)) {
+                if (!(importJSON.Type.equals("Cancellation")) && (importJSON.EndDate == null))
+                {
                     String StartDate = importJSON.Date;
                     int day = Integer.parseInt(StartDate.substring(6));
                     int month = Integer.parseInt(StartDate.substring(4, 6));
@@ -98,9 +101,10 @@ public class ImportJSON{
                 }
             }
 
-        } catch (IOException e) {
+        } 
+        catch (IOException e) 
+        {
             e.printStackTrace();
         }
     }
 }
-
