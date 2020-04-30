@@ -69,8 +69,6 @@ public class ImportJson
                     int day = Integer.parseInt(StartDate.substring(6));
                     int month = Integer.parseInt(StartDate.substring(4, 6));
                     int year = Integer.parseInt(StartDate.substring(0, 4));
-                    new TransientTask("Transient", importJSON.type, new Timeframe(importJSON.startTime,
-                            importJSON.duration), new Date(month, day, year));
                     currentSched.addTask(new TransientTask("Transient", importJSON.type, new Timeframe(importJSON.startTime,
                             importJSON.duration), new Date(month, day, year)));
                 }
