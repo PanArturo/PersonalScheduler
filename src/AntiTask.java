@@ -57,9 +57,6 @@ public class AntiTask extends Task
     private void generateActiveTimes()
     {
         activeTimes = new HashMap<>();
-        Set<Timeframe> dailyTimeframes;
-        dailyTimeframes = new HashSet<>();
-        activeTimes.put(activeDate, dailyTimeframes);
         Timeframe timeframe = getGeneralTimeframe();
         int nextDayRunoff = timeframe.getNextDayRunoff();
         if (nextDayRunoff > 0)
