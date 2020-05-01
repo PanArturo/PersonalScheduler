@@ -6,7 +6,7 @@ import java.util.Set;
  * This is an abstraction for a task that has methods and variables common to all tasks
  * but lacks a specific implementation for determining which dates the task is active.
  */
-public abstract class Task
+public abstract class Task implements Comparable<Task>
 {
     private String taskName, category;
     private Timeframe timeSlot;
@@ -124,6 +124,7 @@ public abstract class Task
 
     /**
      * A general method to determine whether two tasks conflict or not.
+     * 
      * @param task The task to compare against.
      * @return True if the tasks conflict, false otherwise.
      */
@@ -153,6 +154,7 @@ public abstract class Task
     /**
      * Checks whether the timeframe of this task conflicts with that of the given task.
      * Note: This does not consider conflicting dates, only time slots.
+     * 
      * @param task The task to compare against this one.
      * @return True if there is a time slot conflict, false otherwise.
      */
@@ -164,6 +166,7 @@ public abstract class Task
     /**
      * Checks whether the timeframe of this task conflicts with the one provided.
      * Note: This does not consider conflicting dates, only time slots.
+     * 
      * @param timeframe The timeframe tio compare against this one.
      * @return True if there is a time slot conflict, false otherwise.
      */
@@ -174,6 +177,7 @@ public abstract class Task
 
     /**
      * Returns a hash code for quick name lookup.
+     * 
      * @return A hash code for the task.
      */
     @Override
@@ -183,7 +187,17 @@ public abstract class Task
     }
 
     /**
+     * Compares tasks by their timeframes for sorting.
+     */
+    @Override
+    public int compareTo(Task task)
+    {
+        return timeSlot.compareTo(task.timeSlot);
+    }
+
+    /**
      * Gives the name of the task.
+     * 
      * @return The name of the task.
      */
     @Override
@@ -194,6 +208,7 @@ public abstract class Task
 
     /**
      * Checks whether a task is active on a particular date.
+     * 
      * @param date A date object representing the date to check.
      * @return True if the task is active on the specified day, false otherwise.
      */
@@ -202,12 +217,14 @@ public abstract class Task
     /**
      * Generates the dates this task is active along
      * with their corresponding timeframes.
+     * 
      * @return A mapping of active dates to the corresponding active times.
      */
     public abstract Map<Date, Set<Timeframe>> getScheduledTimes();
 
     /**
      * Gets an array of valid categories for the task.
+     * 
      * @return An array of valid categories for the task.
      */
     public abstract String[] getValidCategories();

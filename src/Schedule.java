@@ -2,6 +2,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.TreeSet;
 
 /**
  * A schedule keeps track of the complete list of tasks a user has scheduled.
@@ -350,9 +351,12 @@ public class Schedule
     }
 
     /**
-     * Returns a set of tasks applicable to the provided day
-     * including all types of tasks, considering tasks from the
-     * previous day that extend into the provided day as well.
+     * Returns a set of tasks applicable to the provided day,
+     * including tasks that were not created on that specific day
+     * but extend in from the previous day.
+     * Anti-tasks are not included in this set of tasks, and tasks
+     * that no longer have an occurence on the day due to an anti-task
+     * will not be included in this set.
      * 
      * @param date The date to check.
      * @return A set of tasks applicable to that date,
@@ -361,7 +365,7 @@ public class Schedule
     public Set<Task> getDailyTasks(Date date)
     {
         if (calendar.containsKey(date))
-            return new HashSet<>(calendar.get(date));
+            return new TreeSet<>(calendar.get(date));
         return null;
     }
     
