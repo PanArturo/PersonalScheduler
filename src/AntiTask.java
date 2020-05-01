@@ -1,5 +1,5 @@
 import java.util.Set;
-import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -76,7 +76,7 @@ public class AntiTask extends Task
     private void addDailyTimeframe(Date date, Timeframe timeframe)
     {
         Set<Timeframe> dailyTimeframes;
-        dailyTimeframes = new HashSet<>();
+        dailyTimeframes = new TreeSet<>();
         activeTimes.put(date, dailyTimeframes);
         dailyTimeframes.add(timeframe);
     }

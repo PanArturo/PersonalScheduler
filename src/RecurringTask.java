@@ -1,5 +1,6 @@
 import java.util.Set;
 import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -265,7 +266,7 @@ public class RecurringTask extends Task
         Set<Timeframe> dailyTimeframes;
         if (!activeTimes.containsKey(date))
         {
-            dailyTimeframes = new HashSet<>();
+            dailyTimeframes = new TreeSet<>();
             activeTimes.put(date, dailyTimeframes);
         }
         else
