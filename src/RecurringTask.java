@@ -24,6 +24,8 @@ public class RecurringTask extends Task
      * @param taskName      The name of the task.
      * @param category      The name of the category this task is part of.
      * @param timeframe     The timeframe of the task.
+     * @param startingDate  The date this task becomes active.
+     * @param endingDate    The last date this task could be scheduled.
      * @param taskFrequency The number of days between each occurence of the task.
      * @throws InvalidTaskException If the provided category is not valid.
      */
@@ -47,9 +49,8 @@ public class RecurringTask extends Task
     @Override
     public boolean isActiveOn(Date date)
     {
-        if (hasAntiTaskOn(date))
-            return false;
-        if (activeTimes.containsKey(date))
+        if (activeTimes.containsKey(date)
+            && activeTimes.get(date).size() > 0)
             return true;
         return false;
     }

@@ -73,15 +73,16 @@ public class TransientTask extends Task
         return new HashMap<Date, Set<Timeframe>>(activeTimes);
     }
 
-    @Override
     /**
      * Checks whether a task is active on a particular date.
+     * 
      * @param date A date object representing the date to check.
      * @return True if the task is active on the specified day, false otherwise.
      */
+    @Override
     public boolean isActiveOn(Date date)
     {
-        if (activeDate.equals(date))
+        if (activeTimes.containsKey(date))
             return true;
         return false;
     }
