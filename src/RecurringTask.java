@@ -308,7 +308,8 @@ public class RecurringTask extends Task
         {
             Set<Timeframe> timeframes = activeTimes.get(date);
             timeframes.remove(dailyTimeframe);
-            System.out.println();
+            if (timeframes.size() == 0)
+                activeTimes.remove(date);
         }
     }
 

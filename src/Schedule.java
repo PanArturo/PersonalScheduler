@@ -18,6 +18,9 @@ public class Schedule
     private Set<RecurringTask> recurringTasks;
     private Set<AntiTask> antiTasks;
 
+    // Organize Scheduled Tasks By Category For Quick Access
+    private Map<String, Set<Task>> categories;
+
     /**
      * Initializes a schedule.
      */
@@ -27,6 +30,7 @@ public class Schedule
         transientTasks = new HashSet<>();
         recurringTasks = new HashSet<>();
         antiTasks = new HashSet<>();
+        categories = new HashMap<>();
     }
 
     /**
@@ -88,6 +92,8 @@ public class Schedule
         // Add To Calendar
         for (Date date : newDates)
             addTaskOnDate(date, newTask);
+        // Categorize Task For Quick Lookup
+        categorizeTask(newTask);
     }
 
     /**
@@ -158,6 +164,50 @@ public class Schedule
     }
 
     /**
+     * Adds a task to the category database for quick access.
+     * 
+     * @param task The task to categorize.
+     */
+    private void categorizeTask(Task newTask)
+    {
+        String category = newTask.getCategory();
+        Set<Task> taskSet;
+        if (!categories.containsKey(category))
+        {
+            taskSet = new HashSet<>();
+            categories.put(category, taskSet);
+        }
+        else
+            taskSet = categories.get(category);
+        taskSet.add(newTask);
+    }
+
+    /**
+     * Removes a task from the category database.
+     * 
+     * @param task The task to remove from the categorization database.
+     */
+    private void uncategorizeTask(Task removeTask)
+    {
+        String category = removeTask.getCategory();
+        if (categories.containsKey(category))
+        {
+            Set<Task> tasks = categories.get(category);
+            tasks.remove(removeTask);
+            if (tasks.size() == 0)
+                categories.remove(category);
+        }
+    }
+
+    /**
+     * Gets a set of categories which 
+     */
+    public Set<String> getActiveCategories()
+    {
+        return categories.keySet();
+    }
+
+    /**
      * Removes a transient task from the schedule.
      * 
      * @param removeTask The transient task to remove from the schedule.
@@ -190,6 +240,7 @@ public class Schedule
         Set<Date> dates = times.keySet();
         for (Date date : dates)
             removeTaskOnDate(date, removeTask);
+        uncategorizeTask(removeTask);
     }
 
     /**
@@ -201,7 +252,12 @@ public class Schedule
     private void removeTaskOnDate(Date date, Task removeTask)
     {
         if (calendar.containsKey(date))
-            calendar.get(date).remove(removeTask);
+        {
+            Set<Task> dailyTasks = calendar.get(date);
+            dailyTasks.remove(removeTask);
+            if (dailyTasks.size() == 0)
+                calendar.remove(date);
+        }
     }
 
     /**
@@ -233,6 +289,7 @@ public class Schedule
         if (matchingTask != null)
         {
             antiTasks.add(newTask);
+            categorizeTask(newTask);
             Map<Date, Set<Timeframe>> affectedTimes = matchingTask.addAntiTask(newTask);
             Set<Date> affectedDates = affectedTimes.keySet();
             for (Date date : affectedDates)
@@ -366,6 +423,20 @@ public class Schedule
     {
         if (calendar.containsKey(date))
             return new TreeSet<>(calendar.get(date));
+        return null;
+    }
+
+    /**
+     * Returns a set of tasks in the given category.
+     * 
+     * @param category The category to look under.
+     * @return A set of tasks in that category or null
+     *         if there are no scheduled tasks within that category.
+     */
+    public Set<Task> getTasksByCategory(String category)
+    {
+        if (categories.containsKey(category))
+            return new TreeSet<>(categories.get(category));
         return null;
     }
     

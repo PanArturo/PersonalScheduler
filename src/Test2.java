@@ -66,12 +66,23 @@ public class Test2
         }
 
         // Remove Transient Task First Then Remove Anti-Task
+        System.out.println("\nRemoving Transient Task & Removing Anti-Task");
         schedule.removeTask(fillVoid);
         schedule.removeTask(antiTask);
         
         // View Schedule Again
-        System.out.println("\nNew Schedule: ");
+        System.out.println("\nNew Schedule:");
         viewMonth(schedule, 1, 2020);
+
+        // View Tasks By Category
+        System.out.println("\nTask Categories:");
+        Set<String> categories = schedule.getActiveCategories();
+        for (String category : categories)
+        {
+            System.out.println("Tasks Under " + category + ":");
+            for (Task task : schedule.getTasksByCategory(category))
+                System.out.println("    " + task);
+        }
     }
 
     public static void viewMonth(Schedule schedule, int month, int year)
