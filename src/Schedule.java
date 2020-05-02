@@ -436,7 +436,7 @@ public class Schedule
     public Set<Task> getTasksByCategory(String category)
     {
         if (categories.containsKey(category))
-            return new TreeSet<>(categories.get(category));
+            return new HashSet<>(categories.get(category));
         return null;
     }
     
