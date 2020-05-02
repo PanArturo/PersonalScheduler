@@ -167,7 +167,7 @@ public abstract class Task implements Comparable<Task>
      * Checks whether the timeframe of this task conflicts with the one provided.
      * Note: This does not consider conflicting dates, only time slots.
      * 
-     * @param timeframe The timeframe tio compare against this one.
+     * @param timeframe The timeframe to compare against this one.
      * @return True if there is a time slot conflict, false otherwise.
      */
     public boolean timeFrameConflictsWith(Timeframe timeframe)
