@@ -98,7 +98,7 @@ public class Timeframe implements Comparable<Timeframe>
      * Gets the starting time in hour representation .
      * @return The starting time of the activity ranging from 0.00 (00:00) to 23.75 (23:45).
      */
-    public double getStartingTimeDouble()
+    public double getStartingTimeHours()
     {
         return startingTime / 60.0;
     }
@@ -107,7 +107,7 @@ public class Timeframe implements Comparable<Timeframe>
      * Gets the activity duration in hour representation.
      * @return The duration of the activity in hours.
      */
-    public double getDurationDouble()
+    public double getDurationHours()
     {
         return duration / 60.0;
     }
