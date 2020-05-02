@@ -95,6 +95,24 @@ public class Timeframe implements Comparable<Timeframe>
     }
 
     /**
+     * Gets the starting time in hour representation .
+     * @return The starting time of the activity ranging from 0.00 (00:00) to 23.75 (23:45).
+     */
+    public double getStartingTimeDouble()
+    {
+        return startingTime / 60.0;
+    }
+
+    /**
+     * Gets the activity duration in hour representation.
+     * @return The duration of the activity in hours.
+     */
+    public double getDurationDouble()
+    {
+        return duration / 60.0;
+    }
+
+    /**
      * Gets the number of minutes in the timeframe leading into the next day.
      * For example, a timeframe at 1425 with duration 30 would run 15 minutes into the next day.
      * @return The number of minutes leading into the next day.
