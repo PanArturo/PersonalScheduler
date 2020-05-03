@@ -174,7 +174,7 @@ public class Date implements Comparable<Date>
         else if (month - 1 > 0)
             return new Date(month - 1, getMaxDay(month, year), year);
         else
-            return new Date(12, getMaxDay(12, year + 1), year + 1);
+            return new Date(12, getMaxDay(12, year - 1), year - 1);
     }
 
     /**
