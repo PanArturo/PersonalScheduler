@@ -315,4 +315,13 @@ public class Date implements Comparable<Date>
             return 1;
         return -1;
     }
+
+    /**
+     * Returns a formatted date.
+     */
+    @Override
+    public String toString()
+    {
+        return month + "/" + day + "/" + year;
+    }
 }
