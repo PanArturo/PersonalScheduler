@@ -10,8 +10,8 @@ import java.io.Writer;
 // Requires Gson-2.8.6 dependency
 public class ExportJson
 {
-    public void export(Schedule schedulePassed, File filepath){
-        // String location = filepath.getPath();
+    public void export(Schedule schedulePassed, File filepath)
+    {
         try (Writer writer = new FileWriter(filepath))
         {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
