@@ -1,8 +1,4 @@
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * A schedule keeps track of the complete list of tasks a user has scheduled.
@@ -463,6 +459,11 @@ public class Schedule
     public Set<RecurringTask> getRecurringTasks()
     {
         return new HashSet<RecurringTask>(recurringTasks);
+    }
+
+    public ArrayList<RecurringTask> getrecTask()
+    {
+        return new ArrayList<RecurringTask>(recurringTasks);
     }
 
     /**

@@ -1,3 +1,5 @@
+import com.google.gson.JsonObject;
+
 import java.util.Set;
 import java.util.HashSet;
 import java.util.TreeSet;
@@ -26,7 +28,7 @@ public class RecurringTask extends Task
      * @param timeframe     The timeframe of the task.
      * @param startingDate  The date this task becomes active.
      * @param endingDate    The last date this task could be scheduled.
-     * @param taskFrequency The number of days between each occurence of the task.
+     * @param frequency The number of days between each occurence of the task.
      * @throws InvalidTaskException If the provided category is not valid.
      */
     public RecurringTask(String taskName, String category, Timeframe timeframe, Date startingDate, Date endingDate,
@@ -339,5 +341,52 @@ public class RecurringTask extends Task
     public String[] getValidCategories()
     {
         return validCategories;
+    }
+
+    /**
+     * exportHelper will be used on this recurring task for formatting output
+     *
+     * @param task - Recurring Task object
+     * @return Json object - will be used to add to Json array
+     */
+    public static JsonObject exportHelper(RecurringTask task){
+        JsonObject temp = new JsonObject();
+        Date startDate = task.startingDate;
+        Date endDate = task.endingDate;
+        Timeframe timeF = task.getGeneralTimeframe();
+
+        temp.addProperty("Name", task.getTaskName());
+        temp.addProperty("Type", task.getCategory());
+        temp.addProperty("StartDate", dateHelper(startDate));
+        temp.addProperty("StartTime",timeF.getStartingTimeHours());
+        temp.addProperty("Duration",timeF.getDurationHours());
+        temp.addProperty("EndDate", dateHelper(endDate));
+        temp.addProperty("Frequency", task.getFrequency().getValue());
+
+        return temp;
+    }
+
+    /**
+     * dateHelper method will parse a date object to be used for JSON output
+     *
+     * @param temp - Pass Date object for parsing
+     * @return date string
+     */
+    private static String dateHelper(Date temp){
+        int year = temp.getYear();
+        int day = temp.getDay();
+        int month = temp.getMonth();
+        String yearString = Integer.toString(year);
+        String monthString;
+        String dayString;
+
+        if(month<10) monthString = "0" + Integer.toString(month);
+        else monthString = Integer.toString(month);
+
+        if(day<10) dayString = "0" + Integer.toString(day);
+        else dayString = Integer.toString(day);
+
+        String totalDate = yearString+monthString+dayString;
+        return totalDate;
     }
 }

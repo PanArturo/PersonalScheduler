@@ -8,8 +8,9 @@ public class Test3 {
         Schedule schedule = new Schedule();
         ImportJson inTest = new ImportJson(set1);
 //        inTest.getFromUI(new File("/Users/adamv/Nextcloud/Cal Poly Documents/2020 Spring/CS 3560 -Object Oriented Design and Programming/Set1.json"));
-        schedule.merge(inTest.currentSched);
+        schedule = schedule.merge(inTest.currentSched);
         ExportJson exTest = new ExportJson();
+        exTest.export(schedule, new File(set1.concat("exported.json")));
 
 
 

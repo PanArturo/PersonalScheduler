@@ -79,7 +79,7 @@ public class ImportJson
                     int day = Integer.parseInt(StartDate.substring(6));
                     int month = Integer.parseInt(StartDate.substring(4, 6));
                     int year = Integer.parseInt(StartDate.substring(0, 4));
-                    currentSched.addTask(new TransientTask("Transient", scheduleList.get(i).Type, new Timeframe(scheduleList.get(i).StartTime,
+                    currentSched.addTask(new TransientTask(scheduleList.get(i).Name, scheduleList.get(i).Type, new Timeframe(scheduleList.get(i).StartTime,
                             scheduleList.get(i).Duration), new Date(month, day, year)));
                 }
 
@@ -94,7 +94,7 @@ public class ImportJson
                     int monthEnd = Integer.parseInt(endDate.substring(4, 6));
                     int yearEnd = Integer.parseInt(endDate.substring(0, 4));
 
-                    currentSched.addTask(new RecurringTask("Recurring", scheduleList.get(i).Type, new Timeframe(scheduleList.get(i).StartTime,
+                    currentSched.addTask(new RecurringTask(scheduleList.get(i).Name, scheduleList.get(i).Type, new Timeframe(scheduleList.get(i).StartTime,
                             scheduleList.get(i).Duration),
                             new Date(monthBegin, dayBegin, yearBegin), new Date(monthEnd, dayEnd, yearEnd), TaskFrequency.getFrequency(scheduleList.get(i).Frequency)));
                 }

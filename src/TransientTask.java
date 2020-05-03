@@ -1,3 +1,5 @@
+import com.google.gson.JsonObject;
+
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Map;
@@ -105,4 +107,46 @@ public class TransientTask extends Task
     {
 		return validCategories;
 	}
+
+
+    /**
+     * exportHelper will be used on this transient task for formatting output
+     *
+     * @param task - anti Task object
+     * @return Json object - will be used to add to Json array
+     */
+
+    public static JsonObject exportHelper(TransientTask task){
+        JsonObject temp = new JsonObject();
+        String d = dateHelper(task.getActiveDate());
+        Timeframe timeF = task.getGeneralTimeframe();
+
+        temp.addProperty("Name", task.getTaskName());
+        temp.addProperty("Type", task.getCategory());
+        temp.addProperty("Date", d);
+        temp.addProperty("StartTime",timeF.getStartingTimeHours());
+        temp.addProperty("Duration",timeF.getDurationHours());
+
+
+        return temp;
+    }
+
+    private static String dateHelper(Date temp){
+        int year = temp.getYear();
+        int day = temp.getDay();
+        int month = temp.getMonth();
+        String yearString = Integer.toString(year);
+        String monthString;
+        String dayString;
+
+        if(month<10) monthString = "0" + Integer.toString(month);
+        else monthString = Integer.toString(month);
+
+        if(day<10) dayString = "0" + Integer.toString(day);
+        else dayString = Integer.toString(day);
+
+        String totalDate = yearString+monthString+dayString;
+        return totalDate;
+    }
 }
+
