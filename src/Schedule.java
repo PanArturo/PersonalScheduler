@@ -42,7 +42,12 @@ public class Schedule
         Map<Date, Set<Task>> existingCalendar = existingSchedule.calendar;
         Set<Date> existingDates = existingCalendar.keySet();
         for (Date date : existingDates)
-            calendar.put(date, existingCalendar.get(date));
+            calendar.put(date, new HashSet<>(existingCalendar.get(date)));
+        categories = new HashMap<>();
+        Map<String, Set<Task>> existingCategoryDatabase = existingSchedule.categories;
+        Set<String> existingCategories = existingCategoryDatabase.keySet();
+        for (String category : existingCategories)
+            categories.put(category, new HashSet<>(existingCategoryDatabase.get(category)));
         transientTasks = new HashSet<>(existingSchedule.transientTasks);
         recurringTasks = new HashSet<>(existingSchedule.recurringTasks);
         antiTasks = new HashSet<>(existingSchedule.antiTasks);
@@ -479,12 +484,12 @@ public class Schedule
     public Schedule merge(Schedule otherSchedule)
     {
         Schedule newSchedule = new Schedule(this);
-        for (TransientTask task : otherSchedule.transientTasks)
-            newSchedule.addTask(task);
-        for (TransientTask task : otherSchedule.transientTasks)
+        for (RecurringTask task : otherSchedule.recurringTasks)
             newSchedule.addTask(task);
         for (AntiTask task : otherSchedule.antiTasks)
             newSchedule.antiTasks.add(task);
+        for (TransientTask task : otherSchedule.transientTasks)
+            newSchedule.addTask(task);
         return newSchedule;
     }
     

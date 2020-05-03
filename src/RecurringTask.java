@@ -133,7 +133,10 @@ public class RecurringTask extends Task
         Timeframe timeframe = getGeneralTimeframe();
         int nextDayRunoff = timeframe.getNextDayRunoff();
         Map<Date, Set<Timeframe>> updatedTimes = new HashMap<>();
-        updatedTimes.put(date, new HashSet<>(activeTimes.get(date)));
+        if (activeTimes.containsKey(date))
+            updatedTimes.put(date, new HashSet<>(activeTimes.get(date)));
+        else
+            updatedTimes.put(date, new HashSet<>());
         if (nextDayRunoff > 0)
         {
             Date nextDay = date.getNextDay();
