@@ -134,41 +134,22 @@ public class AntiTask extends Task
 
 
     /**
-     * exportHelper will be used on this anti task for formatting output
+     * Returns a JsonObject with the properties corresponding to
+     * the anti-task.
      *
-     * @param task - anti Task object
-     * @return Json object - will be used to add to Json array
+     * @param task - The task to retrieve properties from.
+     * @return A JsonObject containing the properties corresponding to the task.
      */
-    public static JsonObject exportHelper(AntiTask task){
+    @Override
+    public JsonObject getJsonObject()
+    {
         JsonObject temp = new JsonObject();
-        String d = dateHelper(task.getActiveDate());
-        Timeframe timeF = task.getGeneralTimeframe();
-
-        temp.addProperty("Name", task.getTaskName());
-        temp.addProperty("Type", task.getCategory());
-        temp.addProperty("Date", d);
-        temp.addProperty("StartTime",timeF.getStartingTimeHours());
-        temp.addProperty("Duration",timeF.getDurationHours());
-
-
+        Timeframe timeframe = getGeneralTimeframe();
+        temp.addProperty("Name", getTaskName());
+        temp.addProperty("Type", getCategory());
+        temp.addProperty("Date", activeDate.getConcatenatedDate());
+        temp.addProperty("StartTime", timeframe.getStartingTimeHours());
+        temp.addProperty("Duration", timeframe.getDurationHours());
         return temp;
-    }
-
-    private static String dateHelper(Date temp){
-        int year = temp.getYear();
-        int day = temp.getDay();
-        int month = temp.getMonth();
-        String yearString = Integer.toString(year);
-        String monthString;
-        String dayString;
-
-        if(month<10) monthString = "0" + Integer.toString(month);
-        else monthString = Integer.toString(month);
-
-        if(day<10) dayString = "0" + Integer.toString(day);
-        else dayString = Integer.toString(day);
-
-        String totalDate = yearString+monthString+dayString;
-        return totalDate;
     }
 }

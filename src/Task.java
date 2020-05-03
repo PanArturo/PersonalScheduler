@@ -1,3 +1,5 @@
+import com.google.gson.JsonObject;
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -228,4 +230,13 @@ public abstract class Task implements Comparable<Task>
      * @return An array of valid categories for the task.
      */
     public abstract String[] getValidCategories();
+
+    /**
+     * Returns a JsonObject with the properties corresponding to
+     * the task.
+     *
+     * @param task - The task to retrieve properties from.
+     * @return A JsonObject containing the properties corresponding to the task.
+     */
+    public abstract JsonObject getJsonObject();
 }
