@@ -1,3 +1,6 @@
+package test;
+
+import core.*;
 import java.util.Set;
 
 /**

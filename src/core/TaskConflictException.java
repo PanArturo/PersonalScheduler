@@ -1,5 +1,4 @@
-// Markus Hernandez
-// 2.29.2020
+package core;
 
 /**
  * An exception for conflicting tasks.

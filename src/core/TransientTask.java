@@ -1,3 +1,5 @@
+package core;
+
 import com.google.gson.JsonObject;
 
 import java.util.Set;

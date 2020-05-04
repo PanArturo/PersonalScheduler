@@ -1,3 +1,5 @@
+package core;
+
 /**
  * An enum to represent the possible frequency options for recurring tasks.
  */

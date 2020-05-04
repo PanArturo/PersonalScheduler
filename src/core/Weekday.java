@@ -1,3 +1,5 @@
+package core;
+
 /**
  * An enum to represent every day of the week.
  * The purpose of this enum is to allow weekdays to be added to a weekday set intuitively.

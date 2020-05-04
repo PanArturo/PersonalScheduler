@@ -1,3 +1,5 @@
+package core;
+
 /**
  * An exception for invalid tasks.
  */
