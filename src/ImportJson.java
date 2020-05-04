@@ -12,7 +12,7 @@ public class ImportJson
     private String Name;
     private String Type;
     private String StartDate;
-    private int StartTime;
+    private double StartTime;
     private double Duration;
     private String EndDate;
     private int Frequency;
