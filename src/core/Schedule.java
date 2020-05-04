@@ -235,7 +235,10 @@ public class Schedule
         generalRemoveTask(removeTask);
         recurringTasks.remove(removeTask);
         for (AntiTask antiTask : removeTask.getAntiTasks())
-            removeTask(antiTask);
+        {
+            antiTasks.remove(antiTask);
+            uncategorizeTask(antiTask);
+        }
     }
 
     /**
