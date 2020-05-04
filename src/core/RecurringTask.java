@@ -95,6 +95,16 @@ public class RecurringTask extends Task
     }
 
     /**
+     * Returns a set of anti-tasks attached
+     * to this recurring task.
+     * @return A set of applicable anti-tasks.
+     */
+    public Set<AntiTask> getAntiTasks()
+    {
+        return new HashSet<>(antiTasks);
+    }
+
+    /**
      * Attaches an anti-task to the recurring task.
      * If the anti-task is valid, the occurence of this recurring task
      * corresponding to the anti-task is canceled.

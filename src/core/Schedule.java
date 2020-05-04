@@ -234,6 +234,8 @@ public class Schedule
     {
         generalRemoveTask(removeTask);
         recurringTasks.remove(removeTask);
+        for (AntiTask antiTask : removeTask.getAntiTasks())
+            removeTask(antiTask);
     }
 
     /**
@@ -295,8 +297,6 @@ public class Schedule
         }
         if (matchingTask != null)
         {
-            antiTasks.add(newTask);
-            categorizeTask(newTask);
             Map<Date, Set<Timeframe>> affectedTimes = matchingTask.addAntiTask(newTask);
             Set<Date> affectedDates = affectedTimes.keySet();
             for (Date date : affectedDates)
@@ -304,6 +304,8 @@ public class Schedule
                 if (affectedTimes.get(date).size() == 0)
                     removeTaskOnDate(date, matchingTask);
             }
+            antiTasks.add(newTask);
+            categorizeTask(newTask);
         }
         else
         {
@@ -340,6 +342,7 @@ public class Schedule
         for (Date date : affectedDates)
             addTaskOnDate(date, restoreTask);
         antiTasks.remove(removeTask);
+        uncategorizeTask(removeTask);
     }
 
     /**
@@ -401,15 +404,20 @@ public class Schedule
      */
     public Task getTask(String taskName)
     {
-        Set<Date> dates = calendar.keySet();
-        for (Date date : dates)
+        for (TransientTask task : transientTasks)
         {
-            Set<Task> tasks = calendar.get(date);
-            for (Task task : tasks)
-            {
-                if (task.getTaskName().equals(taskName))
-                    return task;
-            }
+            if (task.getTaskName().equals(taskName))
+                return task;
+        }
+        for (RecurringTask task : recurringTasks)
+        {
+            if (task.getTaskName().equals(taskName))
+                return task;
+        }
+        for (AntiTask task : antiTasks)
+        {
+            if (task.getTaskName().equals(taskName))
+                return task;
         }
         return null;
     }
@@ -489,7 +497,10 @@ public class Schedule
         for (RecurringTask task : otherSchedule.recurringTasks)
             newSchedule.addTask(task);
         for (AntiTask task : otherSchedule.antiTasks)
+        {
             newSchedule.antiTasks.add(task);
+            newSchedule.categorizeTask(task);
+        }
         for (TransientTask task : otherSchedule.transientTasks)
             newSchedule.addTask(task);
         return newSchedule;
