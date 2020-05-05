@@ -323,17 +323,7 @@ public class Main extends Application {
             gp.addRow(3, durationLabel, durationField);
             gp.addRow(4, startDateLabel, startDatePicker);
         }
-/*
-        HBox buttonBox = new HBox(25, addButton, cancelButton);
-        buttonBox.setAlignment(Pos.CENTER);
-        VBox vbox = new VBox(30, gp,buttonBox);
-        vbox.setAlignment(Pos.CENTER);
 
-        gp.setHgap(10);
-        gp.setVgap(50);
-        gp.setAlignment(Pos.CENTER);
-
- */
     }
 
     public void buildDeleteScene(){
@@ -341,12 +331,9 @@ public class Main extends Application {
         taskTypeBox.getSelectionModel().selectFirst();
         if(taskTypeBox.getSelectionModel().isSelected(0)) {
             deleteGP.getChildren().clear();
-            //deleteGP.addRow(0, typeTaskLabel, taskTypeBox);
-            //deleteGP.addRow(1, categoryLabel, recurringValidCatBox);
             deleteGP.addRow(1, categoryLabel, activeCategoryBox);
             deleteGP.addRow(2, nameLabel, nameOptions);
 
-            // Add name options based on category and task. Refer to Markus' new code
         } else if(taskTypeBox.getSelectionModel().isSelected(1)){
             deleteGP.getChildren().clear();
             deleteGP.addRow(0, typeTaskLabel, taskTypeBox);
@@ -776,6 +763,7 @@ public class Main extends Application {
         int maxDay = currentSelectionDateMonth.getMaxDay(currentSelectionDateMonth.getMonth(), currentSelectionDateMonth.getYear());
 
         // Weekday display Sunday, Monday, ...
+        /*
         Label[] weekDays = new Label[7];
         for(int i = 0; i < 7; i++){
             Weekday weekDayName = currentSelectionDateMonth.getWeekday();
@@ -787,7 +775,9 @@ public class Main extends Application {
             gp.setHalignment(weekDays[i], HPos.CENTER);
             currentSelectionDateMonth = currentSelectionDateMonth.getNextDay();
         }
-        currentSelectionDateMonth.setDay(currentSelectionDateMonth.getDay() - 7);
+
+         */
+        //currentSelectionDateMonth.setDay(currentSelectionDateMonth.getDay() - 7);
 
         // Weekday set of Task display
         String[] taskString = new String[7];
