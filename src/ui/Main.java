@@ -388,13 +388,19 @@ public class Main extends Application {
             alert.setHeaderText("Start Time or Duration Time is invalid.");
             alert.showAndWait();
         }
-        Timeframe timeframe = new Timeframe(startTime, duration);
-        if(taskTypeBox.getSelectionModel().isSelected(0)) {
-            category = recurringValidCatBox.getSelectionModel().getSelectedItem();
-            parseRecurInfo(name, category, timeframe);
-        } else {
-            category = transValidCatBox.getSelectionModel().getSelectedItem();
-            parseTransInfo(name, category, timeframe);
+        try {
+            Timeframe timeframe = new Timeframe(startTime, duration);
+            if (taskTypeBox.getSelectionModel().isSelected(0)) {
+                category = recurringValidCatBox.getSelectionModel().getSelectedItem();
+                parseRecurInfo(name, category, timeframe);
+            } else {
+                category = transValidCatBox.getSelectionModel().getSelectedItem();
+                parseTransInfo(name, category, timeframe);
+            }
+        } catch (Exception e){
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText(e.getMessage());
+            alert.showAndWait();
         }
     }
 
@@ -757,7 +763,7 @@ public class Main extends Application {
     }
 
     public GridPane bpMonthNestedMidSectionInitializer(){
-        currentSelectionDateMonth = new Date(today.getMonthValue(), today.getDayOfMonth(), today.getYear());
+        currentSelectionDateMonth = new Date(today.getMonthValue(), 1, today.getYear());
         GridPane gp = new GridPane();
         gp.setVgap(5);
         gp.setHgap(5);
