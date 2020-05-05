@@ -5,17 +5,13 @@ import core.*;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.HPos;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.geometry.VPos;
+import javafx.geometry.*;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -189,16 +185,25 @@ public class Main extends Application {
         addTask.setOnAction(actionEvent -> {
             clearTextFields();
             buildAddTaskScene();
+            primaryStage.setWidth(500);
+            primaryStage.setHeight(700);
+            primaryStage.centerOnScreen();
             primaryStage.setScene(addTaskScene);
         });
         addTaskMenu.setOnAction(actionEvent -> {
             clearTextFields();
             buildAddTaskScene();
+            primaryStage.setWidth(500);
+            primaryStage.setHeight(700);
+            primaryStage.centerOnScreen();
             primaryStage.setScene(addTaskScene);
         });
 
         deleteTaskMenu.setOnAction(actionEvent -> {
             buildDeleteScene();
+            primaryStage.setWidth(500);
+            primaryStage.setHeight(700);
+            primaryStage.centerOnScreen();
             primaryStage.setScene(deleteTaskScene);
             nameOptions.getItems().clear();
             activeCategoryBox.getItems().clear();
@@ -208,6 +213,9 @@ public class Main extends Application {
         });
         deleteTask.setOnAction(actionEvent -> {
             buildDeleteScene();
+            primaryStage.setWidth(500);
+            primaryStage.setHeight(700);
+            primaryStage.centerOnScreen();
             primaryStage.setScene(deleteTaskScene);
             nameOptions.getItems().clear();
             activeCategoryBox.getItems().clear();
@@ -228,21 +236,33 @@ public class Main extends Application {
             deletedAlert.setHeaderText("Task successfully deleted.");
             deletedAlert.showAndWait();
             buildOpenScene();
+            primaryStage.setWidth(500);
+            primaryStage.setHeight(700);
+            primaryStage.centerOnScreen();
             primaryStage.setScene(openScene);
         });
 
         viewSchedule.setOnAction(actionEvent -> {
             buildWeekBorderPane();
+            Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+            primaryStage.setWidth(primaryScreenBounds.getWidth());
+            primaryStage.setHeight(primaryScreenBounds.getHeight());
+            primaryStage.centerOnScreen();
             primaryStage.setScene(openScene);
         });
         schedule.setOnAction(actionEvent -> {
             buildWeekBorderPane();
+            Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+            primaryStage.setWidth(primaryScreenBounds.getWidth());
+            primaryStage.setHeight(primaryScreenBounds.getHeight());
+            primaryStage.centerOnScreen();
             primaryStage.setScene(openScene);
         });
         mainMenu.setOnAction(actionEvent -> {
             buildOpenScene();
             primaryStage.setWidth(500);
             primaryStage.setHeight(700);
+            primaryStage.centerOnScreen();
             primaryStage.setScene(openScene);
         });
 
@@ -252,6 +272,9 @@ public class Main extends Application {
             else
                 parseInfo();
             buildOpenScene();
+            primaryStage.setWidth(500);
+            primaryStage.setHeight(700);
+            primaryStage.centerOnScreen();
             primaryStage.setScene(openScene);
         });
         cancelButton.setOnAction(actionEvent ->  primaryStage.setScene(openScene));
@@ -518,18 +541,21 @@ public class Main extends Application {
 
         Button days = new Button("Day");
         days.setPrefSize(100, 20);
+        days.setStyle("-fx-background-color:white");
         days.setOnAction(e -> {
             buildDayBorderPane();
         });
 
         Button weeks = new Button("Week");
         weeks.setPrefSize(100, 20);
+        weeks.setStyle("-fx-background-color:white");
         weeks.setOnAction(e -> {
             buildWeekBorderPane();
         });
 
         Button months = new Button("Month");
         months.setPrefSize(100, 20);
+        months.setStyle("-fx-background-color:white");
         months.setOnAction(e -> {
             buildMonthBorderPane();
         });
@@ -761,23 +787,6 @@ public class Main extends Application {
         gp.getRowConstraints().add(new RowConstraints(3000));               // row 1 is 3000 wide
 
         int maxDay = currentSelectionDateMonth.getMaxDay(currentSelectionDateMonth.getMonth(), currentSelectionDateMonth.getYear());
-
-        // Weekday display Sunday, Monday, ...
-        /*
-        Label[] weekDays = new Label[7];
-        for(int i = 0; i < 7; i++){
-            Weekday weekDayName = currentSelectionDateMonth.getWeekday();
-            String dayString = weekDayName.toString();
-            Label lb = new Label();
-            lb.setText(dayString);
-            weekDays[i] = lb;
-            gp.add(weekDays[i], i, 0);
-            gp.setHalignment(weekDays[i], HPos.CENTER);
-            currentSelectionDateMonth = currentSelectionDateMonth.getNextDay();
-        }
-
-         */
-        //currentSelectionDateMonth.setDay(currentSelectionDateMonth.getDay() - 7);
 
         // Weekday set of Task display
         String[] taskString = new String[7];
