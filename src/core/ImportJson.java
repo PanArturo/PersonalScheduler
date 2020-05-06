@@ -71,6 +71,7 @@ public class ImportJson
 
     public void importing(File importedSet)
     {
+        currentSched = new Schedule();
         try
         {
             //Creates an ArrayList of individual task objects
