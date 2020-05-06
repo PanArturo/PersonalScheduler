@@ -165,6 +165,7 @@ public class Main extends Application {
                     nameOptions.getItems().clear();
                     for (Task task : scheduleObj.getTasksByCategory(taskCategory))
                         nameOptions.getItems().add(task.getTaskName());
+                    nameOptions.getSelectionModel().selectFirst();
                 }
             }
         });
@@ -208,8 +209,16 @@ public class Main extends Application {
             nameOptions.getItems().clear();
             activeCategoryBox.getItems().clear();
             checkActiveTasks();
-            if(activeCategoryBox.getItems().isEmpty())
+            if(activeCategoryBox.getItems().isEmpty()) {
+                if(bp.getCenter() == bpWeekMidSection || bp.getCenter() == bpDayMidSection ||
+                        bp.getCenter() == bpMonthMidSection) {
+                    Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+                    primaryStage.setWidth(primaryScreenBounds.getWidth());
+                    primaryStage.setHeight(primaryScreenBounds.getHeight());
+                    primaryStage.centerOnScreen();
+                }
                 primaryStage.setScene(openScene);
+            }
         });
         deleteTask.setOnAction(actionEvent -> {
             buildDeleteScene();
@@ -220,21 +229,35 @@ public class Main extends Application {
             nameOptions.getItems().clear();
             activeCategoryBox.getItems().clear();
             checkActiveTasks();
-            if(activeCategoryBox.getItems().isEmpty())
+            if(activeCategoryBox.getItems().isEmpty()) {
+                if(bp.getCenter() == bpWeekMidSection || bp.getCenter() == bpDayMidSection ||
+                        bp.getCenter() == bpMonthMidSection) {
+                    Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+                    primaryStage.setWidth(primaryScreenBounds.getWidth());
+                    primaryStage.setHeight(primaryScreenBounds.getHeight());
+                    primaryStage.centerOnScreen();
+                }
                 primaryStage.setScene(openScene);
+            }
         });
         deleteButton.setOnAction(actionEvent -> {
-            Task selectedTask = scheduleObj.getTask(nameOptions.getValue());
-            if(activeCategoryBox.getValue().equals("Visit") || activeCategoryBox.getValue().equals("Shopping") ||
-               activeCategoryBox.getValue().equals("Appointment"))
-                scheduleObj.removeTask((TransientTask) selectedTask);
-            else if(activeCategoryBox.getValue().equals("Cancellation"))
-                scheduleObj.removeTask((AntiTask) selectedTask);
-            else
-                scheduleObj.removeTask((RecurringTask) selectedTask);
-            Alert deletedAlert = new Alert(Alert.AlertType.INFORMATION);
-            deletedAlert.setHeaderText("Task successfully deleted.");
-            deletedAlert.showAndWait();
+            try {
+                Task selectedTask = scheduleObj.getTask(nameOptions.getValue());
+                if (activeCategoryBox.getValue().equals("Visit") || activeCategoryBox.getValue().equals("Shopping") ||
+                        activeCategoryBox.getValue().equals("Appointment"))
+                    scheduleObj.removeTask((TransientTask) selectedTask);
+                else if (activeCategoryBox.getValue().equals("Cancellation"))
+                    scheduleObj.removeTask((AntiTask) selectedTask);
+                else
+                    scheduleObj.removeTask((RecurringTask) selectedTask);
+                Alert deletedAlert = new Alert(Alert.AlertType.INFORMATION);
+                deletedAlert.setHeaderText("Task successfully deleted.");
+                deletedAlert.showAndWait();
+            } catch (Exception e){
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText(e.getMessage());
+                alert.showAndWait();
+            }
             buildOpenScene();
             primaryStage.setWidth(500);
             primaryStage.setHeight(700);
@@ -277,8 +300,26 @@ public class Main extends Application {
             primaryStage.centerOnScreen();
             primaryStage.setScene(openScene);
         });
-        cancelButton.setOnAction(actionEvent ->  primaryStage.setScene(openScene));
-        deleteCancelButton.setOnAction(actionEvent -> primaryStage.setScene(openScene));
+        cancelButton.setOnAction(actionEvent ->  {
+            if(bp.getCenter() == bpWeekMidSection || bp.getCenter() == bpDayMidSection ||
+               bp.getCenter() == bpMonthMidSection){
+                Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+                primaryStage.setWidth(primaryScreenBounds.getWidth());
+                primaryStage.setHeight(primaryScreenBounds.getHeight());
+                primaryStage.centerOnScreen();
+            }
+            primaryStage.setScene(openScene);
+        });
+        deleteCancelButton.setOnAction(actionEvent ->{
+            if(bp.getCenter() == bpWeekMidSection || bp.getCenter() == bpDayMidSection ||
+                    bp.getCenter() == bpMonthMidSection){
+                Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+                primaryStage.setWidth(primaryScreenBounds.getWidth());
+                primaryStage.setHeight(primaryScreenBounds.getHeight());
+                primaryStage.centerOnScreen();
+            }
+            primaryStage.setScene(openScene);
+        });
 
         exitButton.setOnAction(actionEvent -> System.exit(0));
 
