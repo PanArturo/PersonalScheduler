@@ -180,8 +180,24 @@ public class Main extends Application {
             }
         });
 
-        importFunction.setOnAction(actionEvent -> openFile());
-        saveSchedule.setOnAction(actionEvent -> saveFile());
+        importFunction.setOnAction(actionEvent -> {
+            try {
+                openFile();
+            } catch (Exception e){
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText(e.getMessage());
+                alert.showAndWait();
+            }
+        });
+        saveSchedule.setOnAction(actionEvent ->{
+            try {
+                saveFile();
+            } catch (Exception e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText(e.getMessage());
+                alert.showAndWait();
+            }
+        });
 
         addTask.setOnAction(actionEvent -> {
             clearTextFields();
