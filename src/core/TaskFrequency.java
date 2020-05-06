@@ -1,3 +1,12 @@
+/**
+ * Oscar Bedolla - Testing
+ * Charles Bickham - UI Team
+ * Natalie Dinh - UI Team
+ * Markus Hernandez - Coding Team
+ * Christopher Leung - JSON Team
+ * Arturo Pan Loo - UI Team
+ * Adam VanRiper - JSON Team
+ */
 package core;
 
 /**
